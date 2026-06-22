@@ -39,15 +39,15 @@ public class ExcelProcessor
                   
                Kolon Index, Harf ve Kolon Adı                                  Miktar                    Gizlilik                                          Yöntem         Nitelik                Diğer Açıklama
                ---------------------------------------------------     ----------------------    -----------------------                                 ----------     ---------     ----------------------------------------------------
-                6   G     "Recovery - energy recovery (R1)"             Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  EkYakma         -            -
-                11  L     "Disposal - incineration (D10)"               Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  Yakma           -            -
-                16  Q     "Recovery - recycling"                        Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  GeriKazanım     -            -
-                21  V     "Recovery - backfilling"                      0                         -                                                        -                            miktar verisi hep 0 olacak
-                26  AA    "Recovery - recycling and backfilling"        -                         Recovery-Recyling kısmındaki gizlilik ile aynı olacak.   -               -            Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak. Recovery-Recyling kısmındaki gizlilik ile aynı olacak.
-                31  AF    "Disposal - landfill (D1, D5, D12)"           Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  DDepolama       -            -
-                36  AK    "Disposal - other(D2-D4, D6-D7)"              -                         -                                                        SULU_ORTAM      -            -
-                42  AP    "Disposal - landfill and other(D1-D7, D12)"   -                         Diğer dosyadan alınacak                                  TOTAL_DDSLO     -            Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak.
-                47  AU    "Waste treatment"                             -                         Diğer dosyadan alınacak                                  TOTAL           TOTAL        Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak.
+                6   G    "Recovery - energy recovery (R1)"             Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  EkYakma         -            -
+                11  L    "Disposal - incineration (D10)"               Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  Yakma           -            -
+                16  Q    "Recovery - recycling"                        Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  GeriKazanım     -            -
+                21  V    "Recovery - backfilling"                      0                         -                                                        -                            miktar verisi hep 0 olacak
+                26  AA   "Recovery - recycling and backfilling"        -                         Recovery-Recyling kısmındaki gizlilik ile aynı olacak.   -               -            Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak. Recovery-Recyling kısmındaki gizlilik ile aynı olacak.
+                31  AF   "Disposal - landfill (D1, D5, D12)"           Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  DDepolama       -            -
+                36  AK   "Disposal - other(D2-D4, D6-D7)"              -                         -                                                        SULU_ORTAM      -            -
+                41  AP   "Disposal - landfill and other(D1-D7, D12)"   -                         Diğer dosyadan alınacak                                  TOTAL_DDSLO     -            Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak.
+                46  AU   "Waste treatment"                             -                         Diğer dosyadan alınacak                                  TOTAL           TOTAL        Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak.
  
 
             */            
@@ -71,7 +71,7 @@ public class ExcelProcessor
             	for(int colIdx : colIdxList )
             	{            		
             			
-            		cellMiktar = row.getCell(colIdx);
+            		cellMiktar   = row.getCell(colIdx);
             		cellGizlilik = row.getCell(colIdx+2);
             	            		            	            		            	
 	            	String color = getCellColor(cellMiktar);
@@ -138,8 +138,7 @@ public class ExcelProcessor
             //Excel dosyası açıldığında gelmesi istenen tab belirlemek için aşağıdaki iki satır eklendi.
             workbook.setActiveSheet(9);            
             workbook.setSelectedTab(9);
-            
-            
+                        
             workbook.write(fos);
             workbook.close();
             
@@ -204,19 +203,24 @@ public class ExcelProcessor
     	
     	String nitelik  = getCellValue(row.getCell(5));          //Nitelik(Hazardous, Non-Hazardous, ...
     	String nitelikKodu ="";
+    	
     	if(nitelik.trim().equals("Hazardous"))           
     		nitelikKodu = "1";
     	else if(nitelik.trim().equals("Non-hazardous"))  
-    		nitelikKodu = "2";    	
+    		nitelikKodu = "2";
+    	else if(cell.getColumnIndex()==46)
+    		nitelikKodu="Total";
     
     	//column Type
     	String yontem = "";  
-    	if(cell.getColumnIndex()==6)         yontem = "EKYAKMA";        //"Recovery - energy recovery (R1)"
-    	else if(cell.getColumnIndex()==11)   yontem = "YAKMA";          //"Disposal - incineration   (D10)"
-    	else if(cell.getColumnIndex()==16)   yontem = "GERI KAZANIM";   //"Recovery - recycling"
-    	else if(cell.getColumnIndex()==31)   yontem = "DDEPOLAMA";      //""Disposal - landfill(D1, D5, D12)"
-    	else if(cell.getColumnIndex()==37)   yontem = "SULU_ORTAM";      //""Disposal - landfill(D1, D5, D12)"
-    	      
+    	if(cell.getColumnIndex()==6)         yontem = "EKYAKMA";         //"Recovery - energy recovery (R1)"
+    	else if(cell.getColumnIndex()==11)   yontem = "YAKMA";           //"Disposal - incineration   (D10)"
+    	else if(cell.getColumnIndex()==16)   yontem = "GERI KAZANIM";    //"Recovery - recycling"
+    	else if(cell.getColumnIndex()==31)   yontem = "DDEPOLAMA";       //"Disposal - landfill(D1, D5, D12)"
+    	else if(cell.getColumnIndex()==36)   yontem = "SULU_ORTAM";      //"Disposal - landfill(D1, D5, D12)"
+    	else if(cell.getColumnIndex()==41)   yontem = "TOTAL_DDSLO";     //"Disposal - landfill and other(D1-D7, D12)"
+    	else if(cell.getColumnIndex()==46)   yontem = "Total";           //"Waste treatment"
+    	    	      
     	
     	String birlesik_kod = atikKodu + " " + nitelikKodu + " " + yontem; 
     			
