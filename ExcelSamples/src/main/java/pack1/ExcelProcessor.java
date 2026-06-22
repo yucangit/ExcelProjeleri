@@ -35,16 +35,20 @@ public class ExcelProcessor
             System.out.printf("%-8s   %-10s   %-15s   %-12s   %-10s  %-10s %10s   %-20s       %10s     %-10s \n", "HucreAdresi", "AtikKodu",  "Nitelik", "Yontem", "Renk", "HucreTuru", "RowIndex", "Birlesik", "Miktar", "Gizlilik");
             
             /*
-                6 -> "Recovery - energy recovery (R1)"
-                11-> "Disposal - incineration (D10)"
-                16-> "Recovery - recycling"
-                21-> "Recovery - backfilling"                ->miktar verisi hep 0 olacak
-                26-> "Recovery - recycling and backfilling"
-                31-> "Disposal - landfill (D1, D5, D12)"
-                37-> "Disposal - other(D2-D4, D6-D7)"
-            */
-            int []colIdxList = {6,11,16,21,26,31,37};   //miktar verisinin yazılacağı kolonların excel indexleri (0-based)
-                                                        //Gizlilik kolonları iki kolon sonrası olduğu için ayrıca bir dizi oluşturulmadı.
+                  Excel ilgili kolon listesi - Lookup table
+                   
+                6 -> "Recovery - energy recovery (R1)"            EkYakma
+                11-> "Disposal - incineration (D10)"              Yakma
+                16-> "Recovery - recycling"                       GeriKazanım
+                21-> "Recovery - backfilling"                     -                 ->miktar verisi hep 0 olacak
+                //26-> "Recovery - recycling and backfilling"     -                 ->bu kolon olmayacak sanki. Çünkü hepsi gri renkte.
+                31-> "Disposal - landfill (D1, D5, D12)"          DDepolama
+                37-> "Disposal - other(D2-D4, D6-D7)"             -
+            */            
+
+            
+            int []colIdxList = {6, 11, 16, 21, 31, 36};   //miktar verisinin yazılacağı kolonların excel indexleri (0-based)
+                                                          //Gizlilik kolonları iki kolon sonrası olduğu için ayrıca bir dizi oluşturulmadı.
             
             
             // Iterate over all rows
@@ -59,7 +63,8 @@ public class ExcelProcessor
             	int rowIdx = row.getRowNum();            	            	
             	
             	for(int colIdx : colIdxList )
-            	{
+            	{            		
+            			
             		cellMiktar = row.getCell(colIdx);
             		cellGizlilik = row.getCell(colIdx+2);
             	            		            	            		            	
@@ -84,23 +89,12 @@ public class ExcelProcessor
 	            		            	
 	            	
 	            	int miktar = 0;
-	            	String gizlilik="";
-	            	if(!arr[0].equals("Value_Not_Found")) 
-	            	{
-	            		miktar = Integer.parseInt(arr[0]);
-		            	gizlilik = arr[1];
-	            	}
-	            	else 
-	            	{
-	            		miktar =0;
-	            		gizlilik = "";
-	            	}
-	            	 
+	            	String gizlilik="";	            		            	 
 	            	
 	            	if(!arr[0].equals("Value_Not_Found")) 
 	            	{
-		            	//int miktar = Integer.parseInt(arr[0]);
-		            	//String gizlilik = arr[1];
+		            	miktar = Integer.parseInt(arr[0]);
+		            	gizlilik = arr[1];
 		            	
 		            	System.out.printf("%10d  %10s \n", miktar, gizlilik);
 		            	cellMiktar.setCellValue(miktar);
@@ -111,8 +105,13 @@ public class ExcelProcessor
 	            	}
 	            	else 
 	            	{
+	            		//bu durumdaki hücrelerin gizlilik durumu boş kalıyor. Güncellemeye gerek yok.
+	            		miktar =0;
+	            		//gizlilik = "";                                           
+	            		System.out.printf("%10d  %10s \n", miktar, gizlilik);
+	            		cellMiktar.setCellValue(miktar);
 	            		
-	            		System.out.print("\n");
+	            		//System.out.print("\n");
 	            	}	            	
 	            	
             	}            	            	            	                            	
@@ -127,7 +126,7 @@ public class ExcelProcessor
             
             FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
 
-            // Tüm formülleri tek seferde hesaplatın
+            // Tüm formülleri tek seferde hesaplansın.
             evaluator.evaluateAll();
             
             //Excel dosyası açıldığında gelmesi istenen tab belirlemek için aşağıdaki iki satır eklendi.
