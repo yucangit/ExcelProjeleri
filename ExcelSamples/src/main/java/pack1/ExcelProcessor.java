@@ -32,18 +32,24 @@ public class ExcelProcessor
             Sheet sheet = workbook.getSheetAt(9);   
             
             
-            System.out.printf("%-8s   %-10s   %-15s   %-12s   %-10s  %-10s %10s   %-20s       %10s     %-10s \n", "HucreAdresi", "AtikKodu",  "Nitelik", "Yontem", "Renk", "HucreTuru", "RowIndex", "Birlesik", "Miktar", "Gizlilik");
+            System.out.printf("%-8s   %-10s   %-15s   %-15s   %-10s  %-10s %10s   %-20s       %10s     %-10s \n", "HucreAdresi", "AtikKodu",  "Nitelik", "Yontem", "Renk", "HucreTuru", "RowIndex", "Birlesik", "Miktar", "Gizlilik");
             
             /*
-                  Excel ilgili kolon listesi - Lookup table
-                   
-                6 -> "Recovery - energy recovery (R1)"            EkYakma
-                11-> "Disposal - incineration (D10)"              Yakma
-                16-> "Recovery - recycling"                       GeriKazanım
-                21-> "Recovery - backfilling"                     -                 ->miktar verisi hep 0 olacak
-                //26-> "Recovery - recycling and backfilling"     -                 ->bu kolon olmayacak sanki. Çünkü hepsi gri renkte.
-                31-> "Disposal - landfill (D1, D5, D12)"          DDepolama
-                37-> "Disposal - other(D2-D4, D6-D7)"             -
+               Excel ilgili kolon listesi - Lookup table
+                  
+               Kolon Index, Harf ve Kolon Adı                                  Miktar                    Gizlilik                                          Yöntem         Nitelik                Diğer Açıklama
+               ---------------------------------------------------     ----------------------    -----------------------                                 ----------     ---------     ----------------------------------------------------
+                6   G     "Recovery - energy recovery (R1)"             Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  EkYakma         -            -
+                11  L     "Disposal - incineration (D10)"               Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  Yakma           -            -
+                16  Q     "Recovery - recycling"                        Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  GeriKazanım     -            -
+                21  V     "Recovery - backfilling"                      0                         -                                                        -                            miktar verisi hep 0 olacak
+                26  AA    "Recovery - recycling and backfilling"        -                         Recovery-Recyling kısmındaki gizlilik ile aynı olacak.   -               -            Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak. Recovery-Recyling kısmındaki gizlilik ile aynı olacak.
+                31  AF    "Disposal - landfill (D1, D5, D12)"           Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  DDepolama       -            -
+                36  AK    "Disposal - other(D2-D4, D6-D7)"              -                         -                                                        SULU_ORTAM      -            -
+                42  AP    "Disposal - landfill and other(D1-D7, D12)"   -                         Diğer dosyadan alınacak                                  TOTAL_DDSLO     -            Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak.
+                47  AU    "Waste treatment"                             -                         Diğer dosyadan alınacak                                  TOTAL           TOTAL        Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak.
+ 
+
             */            
 
             
