@@ -19,7 +19,8 @@ public class ExcelProcessor
         String filePath = "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm";
 
         try 
-        { // Dynamic creation works for both xlsx and xlsm
+        { 
+        	// Dynamic creation works for both xlsx and xlsm
         	
         	FileInputStream fis = new FileInputStream(new File(filePath));        		
             Workbook workbook = WorkbookFactory.create(fis);
@@ -48,13 +49,14 @@ public class ExcelProcessor
             
             // Iterate over all rows
             
-            OuterLoop:
-            for (Row row : sheet) {    
+            OuterLoop:                         //Bu etiket, nested loop yapılarında iç döngü içinde işlem yapılırken, gerekirse dış döngüden de çıkılması imkanı veriyor.
+            for (Row row : sheet) 
+            {    
             	            	            	
             	Cell cellMiktar = null;
             	Cell cellGizlilik = null;
             	
-            	int rowIdx = row.getRowNum();
+            	int rowIdx = row.getRowNum();            	            	
             	
             	for(int colIdx : colIdxList )
             	{
@@ -69,47 +71,80 @@ public class ExcelProcessor
 	            	if( !color.equals("FFFFFFFF") )              //mevcut hücre beyaz değilse bir sonraki satira geçilir.
 	            		break;            
 	            	
-	            	if(atikKodu.equals("TOTAL"))                //Bu satırdan sonrasına bakılmasın.  
+	            	if(atikKodu.equals("TOTAL"))                // Bu değer dosyada son veri satırlarını gösteriyor. Bu satırdan sonrasına bakılmasın. (Dış döngüden de çıkılır.)
 	            		break OuterLoop;
 	            	
-	            	if( hucreTuru == CellType.FORMULA )         //NUMERIC, STRING, FORMULA, BLANK, BOOLEAN, ERROR
+	            	if( hucreTuru == CellType.FORMULA )         //CellType possible values = {NUMERIC, STRING, FORMULA, BLANK, BOOLEAN, ERROR}
 	            		break;
 	            	
 	            	String birlesik_kod = getCellKeyValue(sheet, row, cellMiktar);
 	            	
 	            	String value = lookupValue("D:\\KorayBey\\YUSUF_SONUC.xlsx", birlesik_kod, 0, 6 );   //Kolon0:"ATIK_KOD_NITELIK_YONTEM", Kolon6 : "MIKTAR_GIZLILIK");
 	            	String []arr = value.split(" ");
+	            		            	
+	            	
+	            	int miktar = 0;
+	            	String gizlilik="";
+	            	if(!arr[0].equals("Value_Not_Found")) 
+	            	{
+	            		miktar = Integer.parseInt(arr[0]);
+		            	gizlilik = arr[1];
+	            	}
+	            	else 
+	            	{
+	            		miktar =0;
+	            		gizlilik = "";
+	            	}
+	            	 
 	            	
 	            	if(!arr[0].equals("Value_Not_Found")) 
 	            	{
-		            	int miktar = Integer.parseInt(arr[0]);
-		            	String gizlilik = arr[1];
+		            	//int miktar = Integer.parseInt(arr[0]);
+		            	//String gizlilik = arr[1];
 		            	
 		            	System.out.printf("%10d  %10s \n", miktar, gizlilik);
 		            	cellMiktar.setCellValue(miktar);
 		            	if(!arr[1].equals("1"))
-		            		cellGizlilik.setCellValue(gizlilik);		            			            	
+		            		cellGizlilik.setCellValue(gizlilik);		
+		            	
+		            	//break OuterLoop;
 	            	}
 	            	else 
 	            	{
 	            		
 	            		System.out.print("\n");
-	            	}
-            	}
-            	            	            	                            	
+	            	}	            	
+	            	
+            	}            	            	            	                            	
             }   
+            
+            
+            /*
+             	Excel açıldığında formül olan hücreler otomatik görünmüyor.
+              	Bu durumu düzeltmek için formül olan her bir hücre için ilgili hücreye gidip önce "F2" sonra "Enter" tuşlarına basmak gerekiyor.
+            	Bu extra iş yükünü elimine edebilmek için aşağıdaki kod bloğu kullanılmıştır.             
+            */
+            
+            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+            // Tüm formülleri tek seferde hesaplatın
+            evaluator.evaluateAll();
+            
+            //Excel dosyası açıldığında gelmesi istenen tab belirlemek için aşağıdaki iki satır eklendi.
+            workbook.setActiveSheet(9);            
+            workbook.setSelectedTab(9);
             
             
             workbook.write(fos);
             workbook.close();
             
-
         } 
         catch (Exception e) 
         {
             e.printStackTrace();
         }
     }
+    
     
     public static String lookupValue(String filePath, String searchKey, int keyColumn, int returnColumn) 
     {
@@ -149,7 +184,7 @@ public class ExcelProcessor
         }
         return "Value_Not_Found";
     }
-    
+        
     public static String getCellKeyValue(Sheet sheet, Row row, Cell cell) 
     {
     	//returns concatenated properties
@@ -184,11 +219,11 @@ public class ExcelProcessor
     	
     	return birlesik_kod;
     }
-
+    
     private static String getCellValue(Cell cell) 
     {
     	//Bu fonksiyon birleştirilmiş hücrelerde sadece ilk hücrenin değerini doğru getiriyor.
-    	//Diğerlerinin boş getiriyor. 
+    	//Diğerlerini boş getiriyor. 
     	
         // DataFormatter cleanly stringifies numbers, dates, and text styles automatically
         DataFormatter formatter = new DataFormatter();
@@ -219,7 +254,7 @@ public class ExcelProcessor
         
         return getFormattedValue(cell);
     }
-
+    
     private static String getFormattedValue(Cell cell) 
     {
         DataFormatter formatter = new DataFormatter();
