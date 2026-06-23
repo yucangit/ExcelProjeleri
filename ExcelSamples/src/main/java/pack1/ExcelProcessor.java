@@ -35,31 +35,30 @@ public class ExcelProcessor
             System.out.printf("%-8s   %-10s   %-15s   %-15s   %-10s  %-10s %10s   %-20s       %10s     %-10s \n", "HucreAdresi", "AtikKodu",  "Nitelik", "Yontem", "Renk", "HucreTuru", "RowIndex", "Birlesik", "Miktar", "Gizlilik");
             
             /*
-               Excel ilgili kolon listesi - Lookup table
+              Excel ilgili kolon listesi - Lookup table
                   
-               Kolon Index, Harf ve Kolon Adı                                  Miktar                    Gizlilik                                          Yöntem         Nitelik                Diğer Açıklama
-               ---------------------------------------------------     ----------------------    -----------------------                                 ----------     ---------     ----------------------------------------------------
-                6   G    "Recovery - energy recovery (R1)"             Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  EkYakma         -            -
-                11  L    "Disposal - incineration (D10)"               Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  Yakma           -            -
-                16  Q    "Recovery - recycling"                        Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  GeriKazanım     -            -
-                21  V    "Recovery - backfilling"                      0                         -                                                        -                            miktar verisi hep 0 olacak
-                26  AA   "Recovery - recycling and backfilling"        -                         Recovery-Recyling kısmındaki gizlilik ile aynı olacak.   -               -            Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak. Recovery-Recyling kısmındaki gizlilik ile aynı olacak.
-                31  AF   "Disposal - landfill (D1, D5, D12)"           Diğer dosyadan alınacak   Diğer dosyadan alınacak                                  DDepolama       -            -
-                36  AK   "Disposal - other(D2-D4, D6-D7)"              -                         -                                                        SULU_ORTAM      -            -
-                41  AP   "Disposal - landfill and other(D1-D7, D12)"   -                         Diğer dosyadan alınacak                                  TOTAL_DDSLO     -            Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak.
-                46  AU   "Waste treatment"                             -                         Diğer dosyadan alınacak                                  TOTAL           TOTAL        Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak.
- 
-
+              Kolon Index, Harf ve Kolon Adı                                  Miktar                 Gizlilik                                              Yöntem         Nitelik                Diğer Açıklamalar
+             ---------------------------------------------------     ----------------------    -----------------------                                    ----------     ---------     ----------------------------------------------------
+              6   G    "Recovery - energy recovery (R1)"             Diğer dosyadan alınacak   Diğer dosyadan alınacak                                    EkYakma         -            -
+              11  L    "Disposal - incineration (D10)"               Diğer dosyadan alınacak   Diğer dosyadan alınacak                                    Yakma           -            -
+              16  Q    "Recovery - recycling"                        Diğer dosyadan alınacak   Diğer dosyadan alınacak                                    GeriKazanım     -            -
+              21  V    "Recovery - backfilling"                      0                         -                                                          -                            miktar verisi hep 0 olacak
+              26  AA   "Recovery - recycling and backfilling"        Formül var.	           "Recovery-Recycling" kısmındaki gizlilik ile aynı olacak.  -               -            Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak. Recovery-Recyling kısmındaki gizlilik ile aynı olacak.
+              31  AF   "Disposal - landfill (D1, D5, D12)"           Diğer dosyadan alınacak   Diğer dosyadan alınacak                                    DDepolama       -            -
+              36  AK   "Disposal - other(D2-D4, D6-D7)"              Formül var.               Diğer dosyadan alınacak                                    SULU_ORTAM      -            -
+              41  AP   "Disposal - landfill and other(D1-D7, D12)"   Formül var.               Diğer dosyadan alınacak                                    TOTAL_DDSLO     -            Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak.
+              46  AU   "Waste treatment"                             Formül var.               Diğer dosyadan alınacak                                    Total           Total        Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak. 
             */            
 
             
-            int []colIdxList = {6, 11, 16, 21, 31, 36};   //miktar verisinin yazılacağı kolonların excel indexleri (0-based)
-                                                          //Gizlilik kolonları iki kolon sonrası olduğu için ayrıca bir dizi oluşturulmadı.
+            //Güncelleme yapılacak kolonlar (miktar)
+            int []colIdxList = {6, 11, 16, 21, 26, 31, 36, 41, 46};        //miktar verisinin yazılacağı kolonların excel indexleri (0-based)
+                                                                           //Gizlilik kolonları iki kolon sonrası olduğu için ayrıca bir dizi oluşturulmadı.
             
             
             // Iterate over all rows
             
-            OuterLoop:                         //Bu etiket, nested loop yapılarında iç döngü içinde işlem yapılırken, gerekirse dış döngüden de çıkılması imkanı veriyor.
+            OuterLoop:                                     //Bu etiket, nested loop yapılarında iç döngü içinde işlem yapılırken, gerekirse dış döngüden de çıkılması imkanı veriyor.
             for (Row row : sheet) 
             {    
             	            	            	
@@ -79,14 +78,14 @@ public class ExcelProcessor
 	            	
 	            	String atikKodu = getCellValue2(sheet, rowIdx, 1);       //W011, ...            	
 	            	            	
-	            	if( !color.equals("FFFFFFFF") )              //mevcut hücre beyaz değilse bir sonraki satira geçilir.
+	            	if( !color.equals("FFFFFFFF") && !(hucreTuru!=CellType.FORMULA))    //mevcut hücre beyaz değilse ve formül yoksa bir sonraki satira geçilir.
 	            		break;            
 	            	
 	            	if(atikKodu.equals("TOTAL"))                // Bu değer dosyada son veri satırlarını gösteriyor. Bu satırdan sonrasına bakılmasın. (Dış döngüden de çıkılır.)
 	            		break OuterLoop;
 	            	
-	            	if( hucreTuru == CellType.FORMULA )         //CellType possible values = {NUMERIC, STRING, FORMULA, BLANK, BOOLEAN, ERROR}
-	            		break;
+	            	//if( hucreTuru == CellType.FORMULA )         //CellType possible values = {NUMERIC, STRING, FORMULA, BLANK, BOOLEAN, ERROR}
+	            	//	break;
 	            	
 	            	String birlesik_kod = getCellKeyValue(sheet, row, cellMiktar);
 	            	
@@ -103,9 +102,44 @@ public class ExcelProcessor
 		            	gizlilik = arr[1];
 		            	
 		            	System.out.printf("%10d  %10s \n", miktar, gizlilik);
-		            	cellMiktar.setCellValue(miktar);
-		            	if(!arr[1].equals("1"))
-		            		cellGizlilik.setCellValue(gizlilik);		
+		            	
+		            	if( colIdx == 6 ||  colIdx == 11 || colIdx == 16 || colIdx == 31  )    //hem miktar hem de gizlilik verisi diğer dosyadan alınacak.
+		            	{
+		            		cellMiktar.setCellValue(miktar);
+			            	
+			            	if( arr[1].equals("C") || arr[1].equals("D") )
+			            		cellGizlilik.setCellValue(gizlilik);				            		
+		            	}
+		            	else if( colIdx == 21 )                                      //miktar=0 olmalı, gizlilik ise boş olmalı.
+		            	{
+		            		miktar = 0;
+		            		cellMiktar.setCellValue(miktar);
+			            	
+			            	//if( arr[1].equals("C") || arr[1].equals("D") )
+			            		//cellGizlilik.setCellValue(gizlilik);		
+		            		
+		            	}
+		            	else if( colIdx == 26 )                                   //Miktar kısmında formül olduğu için bu kısma dokunulmayacak. Gizlilik kısmı ise "Recovery-Recycling"(colIdx = 16) kısmındaki gizlilik ile aynı olacak.
+		            	{
+		            		//cellMiktar.setCellValue(miktar);
+		            		
+		            		Cell cell16Gizlilik = row.getCell(16+2);               //18.kolondaki hücre
+		            		gizlilik = getCellValue(cell16Gizlilik);
+			            	
+			            	if( arr[1].equals("C") || arr[1].equals("D") )
+			            		cellGizlilik.setCellValue(gizlilik);		
+		            		
+		            	}
+		            	else if ( colIdx == 36 || colIdx == 41 || colIdx == 46 )    //Bu kolonların miktar kısmında formül var. Dolayısıyla bu kısım ayrıca güncellenmeyecek. Gizlilik kısmı ise diğer dosyadan alınacak 
+		            	{
+		            		//cellMiktar.setCellValue(miktar);
+			            	
+			            	if( arr[1].equals("C") || arr[1].equals("D") )
+			            		cellGizlilik.setCellValue(gizlilik);		
+		            		
+		            	}
+		            	
+		            	
 		            	
 		            	//break OuterLoop;
 	            	}
@@ -115,10 +149,12 @@ public class ExcelProcessor
 	            		miktar =0;
 	            		//gizlilik = "";                                           
 	            		System.out.printf("%10d  %10s \n", miktar, gizlilik);
-	            		cellMiktar.setCellValue(miktar);
-	            		
+	            		cellMiktar.setCellValue(miktar);	            		
 	            		//System.out.print("\n");
-	            	}	            	
+	            	}	    
+	            	
+	            	
+	            	
 	            	
             	}            	            	            	                            	
             }   
