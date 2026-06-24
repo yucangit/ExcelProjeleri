@@ -12,11 +12,18 @@ import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 public class ExcelProcessor 
 {
     public static void main(String[] args) 
     {
         String filePath = "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm";
+        
+        copyFile();
 
         try 
         { 
@@ -32,7 +39,7 @@ public class ExcelProcessor
             Sheet sheet = workbook.getSheetAt(9);   
             
             
-            System.out.printf("%-8s   %-10s   %-15s   %-15s   %-10s  %-10s %10s   %-20s       %10s     %-10s \n", "HucreAdresi", "AtikKodu",  "Nitelik", "Yontem", "Renk", "HucreTuru", "RowIndex", "Birlesik", "Miktar", "Gizlilik");
+            System.out.printf("%-8s   %-10s   %-15s   %-15s   %-10s  %-10s %10s   %-25s   %10s     %-10s \n", "HucreAdresi", "AtikKodu",  "Nitelik", "Yontem", "Renk", "HucreTuru", "RowIndex", "Birlesik", "Miktar", "Gizlilik");
             
             /*
               Excel ilgili kolon listesi - Lookup table
@@ -58,18 +65,20 @@ public class ExcelProcessor
             
             // Iterate over all rows
             
-            OuterLoop:                                     //Bu etiket, nested loop yapılarında iç döngü içinde işlem yapılırken, gerekirse dış döngüden de çıkılması imkanı veriyor.
+            OuterLoop:                                        //Bu etiket, nested loop yapılarında iç döngü içinde işlem yapılırken, gerekirse dış döngüden de çıkılması imkanı veriyor.
             for (Row row : sheet) 
             {    
             	            	            	
             	Cell cellMiktar = null;
             	Cell cellGizlilik = null;
             	
-            	int rowIdx = row.getRowNum();            	            	
+            	int rowIdx = row.getRowNum();
+            	
+            	if(rowIdx>117)                  //Bu değer dosyada son veri satırlarını gösteriyor. Bu satırdan sonrasına bakılmasın. (Dış döngüden de çıkılır.)
+            		break;
             	
             	for(int colIdx : colIdxList )
-            	{            		
-            			
+            	{            		            			
             		cellMiktar   = row.getCell(colIdx);
             		cellGizlilik = row.getCell(colIdx+2);
             	            		            	            		            	
@@ -78,11 +87,8 @@ public class ExcelProcessor
 	            	
 	            	String atikKodu = getCellValue2(sheet, rowIdx, 1);       //W011, ...            	
 	            	            	
-	            	if( !color.equals("FFFFFFFF") && !(hucreTuru!=CellType.FORMULA))    //mevcut hücre beyaz değilse ve formül yoksa bir sonraki satira geçilir.
-	            		break;            
-	            	
-	            	if(atikKodu.equals("TOTAL"))                // Bu değer dosyada son veri satırlarını gösteriyor. Bu satırdan sonrasına bakılmasın. (Dış döngüden de çıkılır.)
-	            		break OuterLoop;
+	            	if( !color.equals("FFFFFFFF") && (hucreTuru!=CellType.FORMULA) )    //mevcut hücre beyaz değilse ve formül yoksa bir sonraki satira geçilir.
+	            		break;            	            	
 	            	
 	            	//if( hucreTuru == CellType.FORMULA )         //CellType possible values = {NUMERIC, STRING, FORMULA, BLANK, BOOLEAN, ERROR}
 	            	//	break;
@@ -94,21 +100,54 @@ public class ExcelProcessor
 	            		            	
 	            	
 	            	int miktar = 0;
-	            	String gizlilik="";	            		            	 
+	            	String gizlilik="";	  
+	            	
+	            	if(rowIdx==9)
+	            		System.out.print("");
 	            	
 	            	if(!arr[0].equals("Value_Not_Found")) 
 	            	{
 		            	miktar = Integer.parseInt(arr[0]);
 		            	gizlilik = arr[1];
 		            	
-		            	System.out.printf("%10d  %10s \n", miktar, gizlilik);
+		            	System.out.printf("%5d  %10s \n", miktar, gizlilik);
 		            	
-		            	if( colIdx == 6 ||  colIdx == 11 || colIdx == 16 || colIdx == 31  )    //hem miktar hem de gizlilik verisi diğer dosyadan alınacak.
+		            	if( colIdx == 6 ||  colIdx == 11 || colIdx == 31  )    
 		            	{
+		            		/*
+		            			Hem miktar hem de gizlilik verisi diğer dosyadan alınacak.
+		            			Kolon : 6  - "Recovery - energy recovery (R1)"           
+		            			Kolon :11  - "Disposal - incineration (D10)"             
+		            			Kolon :31  - "Disposal - landfill (D1, D5, D12)"                       
+		            		*/
+		            		
 		            		cellMiktar.setCellValue(miktar);
 			            	
 			            	if( arr[1].equals("C") || arr[1].equals("D") )
 			            		cellGizlilik.setCellValue(gizlilik);				            		
+		            	}
+		            	else if( colIdx == 16 )                              
+		            	{
+		            		/*
+		            		 	Bu kolonun hem miktar hem de gizlilik verisi diğer dosyadan alınacak.
+		            		 	Kolon : 16  - "Recovery - recycling"
+		            		 
+		            		 	Ayrıca 26. kolonun gizlilik değeri güncellenecek.	            		
+		            		
+		            			Kolon : 26 - "Recovery - recycling and backfilling"
+		            			"Recovery - recycling" kısmındaki gizlilik değeri ile "Recovery - recycling and backfilling" kısmındaki gizlilik değeri aynı olması gerektiğinden bu işlem de bu kısımda yapıldı. 		            		 
+		            		*/
+		            		
+		            		cellMiktar.setCellValue(miktar);
+			            	
+			            	if( arr[1].equals("C") || arr[1].equals("D") ) 
+			            	{
+			            		cellGizlilik.setCellValue(gizlilik);
+			            	
+			            		Cell cell26Gizlilik = row.getCell(26+2);                //(26+2).kolondaki hücre			            				            				            
+			            		cell26Gizlilik.setCellValue(gizlilik);	
+			            	}
+		            		
 		            	}
 		            	else if( colIdx == 21 )                                      //miktar=0 olmalı, gizlilik ise boş olmalı.
 		            	{
@@ -119,28 +158,33 @@ public class ExcelProcessor
 			            		//cellGizlilik.setCellValue(gizlilik);		
 		            		
 		            	}
-		            	else if( colIdx == 26 )                                   //Miktar kısmında formül olduğu için bu kısma dokunulmayacak. Gizlilik kısmı ise "Recovery-Recycling"(colIdx = 16) kısmındaki gizlilik ile aynı olacak.
+		            	else if( colIdx == 26 )                                     //Miktar kısmında formül olduğu için bu kısma dokunulmayacak. Gizlilik kısmı ise "Recovery-Recycling"(colIdx = 16) kısmındaki gizlilik ile aynı olacak.
 		            	{
-		            		//cellMiktar.setCellValue(miktar);
-		            		
-		            		Cell cell16Gizlilik = row.getCell(16+2);               //18.kolondaki hücre
-		            		gizlilik = getCellValue(cell16Gizlilik);
-			            	
-			            	if( arr[1].equals("C") || arr[1].equals("D") )
-			            		cellGizlilik.setCellValue(gizlilik);		
+		            		/*
+		            		    Bu kısımın gizlilik değerinin güncellenmesi gerekiyor.
+		            		 	Kolon 26 :  "Recovery - recycling and backfilling"
+		            			
+		            			Bu kısımın gizlilik değeri ile 16. kolonun gizlilik değeri aynı olması gerektiğinden bu işlem yukarıda 16.kolon ile ilgili işlemlerin yapıldığı kısımda yapılmıştır. 
+			            	*/		
 		            		
 		            	}
 		            	else if ( colIdx == 36 || colIdx == 41 || colIdx == 46 )    //Bu kolonların miktar kısmında formül var. Dolayısıyla bu kısım ayrıca güncellenmeyecek. Gizlilik kısmı ise diğer dosyadan alınacak 
 		            	{
+		            		/*
+		            		 	Bu kısımların miktar kısmında formul bulunduğundan bu hücrelerde bir güncelleme yapılmamalı.
+		            		 	Gizlilik değeri ise diğer dosyadan alınmalıdır.
+		            		 	
+			            		Kolon: 36 - "Disposal - other(D2-D4, D6-D7)"           
+			            		Kolon: 41 - "Disposal - landfill and other(D1-D7, D12)"
+			            		Kolon: 46 - "Waste treatment"                          
+							*/
+		            		
 		            		//cellMiktar.setCellValue(miktar);
 			            	
 			            	if( arr[1].equals("C") || arr[1].equals("D") )
 			            		cellGizlilik.setCellValue(gizlilik);		
 		            		
-		            	}
-		            	
-		            	
-		            	
+		            	}		            			            			            	
 		            	//break OuterLoop;
 	            	}
 	            	else 
@@ -148,13 +192,10 @@ public class ExcelProcessor
 	            		//bu durumdaki hücrelerin gizlilik durumu boş kalıyor. Güncellemeye gerek yok.
 	            		miktar =0;
 	            		//gizlilik = "";                                           
-	            		System.out.printf("%10d  %10s \n", miktar, gizlilik);
+	            		System.out.printf("%5d  %10s \n", miktar, gizlilik);
 	            		cellMiktar.setCellValue(miktar);	            		
 	            		//System.out.print("\n");
-	            	}	    
-	            	
-	            	
-	            	
+	            	}	    	            		            		            	
 	            	
             	}            	            	            	                            	
             }   
@@ -244,8 +285,10 @@ public class ExcelProcessor
     		nitelikKodu = "1";
     	else if(nitelik.trim().equals("Non-hazardous"))  
     		nitelikKodu = "2";
-    	else if(cell.getColumnIndex()==46)
-    		nitelikKodu="Total";
+    	else if(nitelik.trim().equals("Total"))
+    		nitelikKodu="Total";    	
+    	//else if(cell.getColumnIndex()==46)
+    	//	nitelikKodu="Total";
     
     	//column Type
     	String yontem = "";  
@@ -259,8 +302,9 @@ public class ExcelProcessor
     	    	      
     	
     	String birlesik_kod = atikKodu + " " + nitelikKodu + " " + yontem; 
-    			
-    	System.out.printf("%-8s      %-10s   %-15s   %-12s   %-10s  %-10s  %5d       %-25s", cell.getAddress() , atikKodu,   nitelik,   yontem,   color, hucreTuru.toString(), rowIdx, birlesik_kod );    	
+    	
+    	//System.out.printf("%-8s   %-10s   %-15s   %-15s   %-10s  %-10s  %10s   %-20s       %10s     %-10s \n", "HucreAdresi", "AtikKodu",  "Nitelik", "Yontem", "Renk", "HucreTuru", "RowIndex", "Birlesik", "Miktar", "Gizlilik");
+    	System.out.printf("%-8s      %-10s   %-15s   %-15s   %-10s  %-10s  %5d       %-30s",  cell.getAddress() , atikKodu,   nitelik,   yontem,   color, hucreTuru.toString(), rowIdx, birlesik_kod );    	
     	
     	return birlesik_kod;
     }
@@ -391,6 +435,20 @@ public class ExcelProcessor
         {
         	e.printStackTrace();        	
         }            	
+    }
+
+    public static void copyFile() 
+    {
+        Path source = Paths.get("D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b - Orjinal.xlsm");
+        Path target = Paths.get("D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm");
+
+        try {
+            // Overwrites the existing file if it is already present
+            Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("File copied successfully!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 
