@@ -26,6 +26,14 @@
 	    <version>5.2.5</version>
 	</dependency>
 
+
+	<!-- Source: https://mvnrepository.com/artifact/org.eclipse.platform/org.eclipse.swt -->
+	<dependency>
+	    <groupId>org.eclipse.platform</groupId>
+	    <artifactId>org.eclipse.swt</artifactId>
+	    <version>3.131.0</version>
+	    <scope>compile</scope>
+	</dependency>
   </dependencies>
   
 </project>

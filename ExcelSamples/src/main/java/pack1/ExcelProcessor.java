@@ -17,13 +17,24 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+
 public class ExcelProcessor 
 {
     public static void main(String[] args) 
+    {        
+    	String doldurulacakDosyaPath = "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm";
+    	String veriDosyasiPath  = "D:\\KorayBey\\YUSUF_SONUC.xlsx";
+    	
+    	dosyaDoldur(doldurulacakDosyaPath, veriDosyasiPath);        
+    }
+    
+    public static void dosyaDoldur(String doldurulacakDosyaPath, String veriDosyasiPath) 
     {
-        String filePath = "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm";
+        //String filePath = "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm";
+    	String filePath = doldurulacakDosyaPath;
+    	//String veriDosyasiPath = "D:\\KorayBey\\YUSUF_SONUC.xlsx";
         
-        copyFile();
+        copyFile("D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b - Orjinal.xlsm", "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm");
 
         try 
         { 
@@ -95,7 +106,9 @@ public class ExcelProcessor
 	            	
 	            	String birlesik_kod = getCellKeyValue(sheet, row, cellMiktar);
 	            	
-	            	String value = lookupValue("D:\\KorayBey\\YUSUF_SONUC.xlsx", birlesik_kod, 0, 6 );   //Kolon0:"ATIK_KOD_NITELIK_YONTEM", Kolon6 : "MIKTAR_GIZLILIK");
+	            	//String value = lookupValue("D:\\KorayBey\\YUSUF_SONUC.xlsx", birlesik_kod, 0, 6 );   //Kolon0:"ATIK_KOD_NITELIK_YONTEM", Kolon6 : "MIKTAR_GIZLILIK");
+	            	String value = lookupValue(veriDosyasiPath, birlesik_kod, 0, 6 );   //Kolon0:"ATIK_KOD_NITELIK_YONTEM", Kolon6 : "MIKTAR_GIZLILIK");
+	            	
 	            	String []arr = value.split(" ");
 	            		            	
 	            	
@@ -437,10 +450,13 @@ public class ExcelProcessor
         }            	
     }
 
-    public static void copyFile() 
+    public static void copyFile(String sourceFilePath, String targetFilePath) 
     {
-        Path source = Paths.get("D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b - Orjinal.xlsm");
-        Path target = Paths.get("D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm");
+        //Path source = Paths.get("D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b - Orjinal.xlsm");
+        //Path target = Paths.get("D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm");
+    	
+        Path source = Paths.get(sourceFilePath);
+        Path target = Paths.get(targetFilePath);
 
         try {
             // Overwrites the existing file if it is already present
