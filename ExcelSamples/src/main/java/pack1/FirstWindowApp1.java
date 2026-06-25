@@ -103,12 +103,12 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		panel3 = new JPanel();
 		panel3.setLayout(null);
 		panel3.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Kontrol \u0130\u015Flemleri", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel3.setBounds(10, 138, 793, 145);
+		panel3.setBounds(10, 138, 793, 168);
 		contentPane.add(panel3);
 		
 		JTextArea textArea = new JTextArea();
 		textArea.setEditable(false);
-		textArea.setBounds(179, 29, 268, 105);
+		textArea.setBounds(179, 29, 268, 128);
 		panel3.add(textArea);
 		
 		JButton btnKontrolislemleriniYap = new JButton("Kontrol İşlemlerini Yap");
@@ -116,7 +116,7 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		btnKontrolislemleriniYap.setBounds(10, 38, 145, 63);
+		btnKontrolislemleriniYap.setBounds(10, 53, 145, 63);
 		panel3.add(btnKontrolislemleriniYap);
 		
 		JLabel lblYaplanKontroller = new JLabel("Yapılan Kontroller : ");
@@ -126,7 +126,7 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		panel2 = new JPanel();
 		panel2.setLayout(null);
 		panel2.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Nihai Verilerin Olu\u015Fturulmas\u0131", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel2.setBounds(10, 294, 793, 174);
+		panel2.setBounds(10, 317, 793, 145);
 		contentPane.add(panel2);
 		
 		btnNihaiDosyaOlustur = new JButton("Nihai Dosyayı oluştur");
