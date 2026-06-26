@@ -8,9 +8,12 @@ import javax.swing.JFileChooser;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.nio.file.Paths;
+import java.util.Objects;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.border.LineBorder;
 import java.awt.Color;
 import javax.swing.border.TitledBorder;
@@ -22,16 +25,29 @@ import javax.swing.JTextArea;
 public class FirstWindowApp1 extends JFrame implements ActionListener 
 {
 	private JPanel contentPane;
-	private JButton btnNihaiDosyaOlustur;
-	private JLabel lblDoldurulacakDosya1;
-	private JLabel lblVerilerinBulunduguDosya1;
 	private JButton btnDosyaSec1;
 	private JButton btnDosyaSec2;
+	private JButton btnKontrolislemleriniYap;
+	private JButton btnNihaiDosyaOlustur;
+	
+	private JLabel lblDoldurulacakDosya1;
+	private JLabel lblVerilerinBulunduguDosya1;	
 	private JLabel lblSecilenDosya1Path;
 	private JLabel lblSecilenDosya2Path;
+	private JLabel lblIlemSonucuhatalar;
+	
 	private JPanel panel1;
 	private JPanel panel2;
 	private JPanel panel3;
+	
+	private JTextArea txtrBuKsmHenz;
+	private JTextArea textArea1;
+		
+	File chosenFile1, chosenFile2;
+	
+	String doldurulacakDosyaPath;
+	String doldurulacakDosyaKopyaPath;
+	String veriDosyasiPath;
 	
 
 	/**
@@ -59,7 +75,7 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 	{
 		this.setTitle("EuroStat Verilerinin Oluşturulması");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 836, 531);
+		setBounds(100, 100, 695, 531);
 		
 		contentPane = new JPanel();		
 		contentPane.setBorder(new LineBorder(new Color(0, 0, 0)));		
@@ -69,7 +85,7 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		
 		panel1 = new JPanel();
 		panel1.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Girdi Dosyalar\u0131n\u0131n Se\u00E7ilmesi", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel1.setBounds(10, 28, 793, 99);
+		panel1.setBounds(10, 28, 652, 99);
 		contentPane.add(panel1);
 		panel1.setLayout(null);
 		
@@ -103,44 +119,43 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		panel3 = new JPanel();
 		panel3.setLayout(null);
 		panel3.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Kontrol \u0130\u015Flemleri", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel3.setBounds(10, 138, 793, 168);
+		panel3.setBounds(10, 138, 652, 168);
 		contentPane.add(panel3);
 		
-		JTextArea textArea = new JTextArea();
-		textArea.setEditable(false);
-		textArea.setBounds(179, 29, 268, 128);
-		panel3.add(textArea);
+		txtrBuKsmHenz = new JTextArea();
+		txtrBuKsmHenz.setFont(new Font("Monospaced", Font.PLAIN, 11));
+		txtrBuKsmHenz.setEditable(false);
+		txtrBuKsmHenz.setBounds(180, 29, 340, 128);
+		panel3.add(txtrBuKsmHenz);
 		
-		JButton btnKontrolislemleriniYap = new JButton("Kontrol İşlemlerini Yap");
-		btnKontrolislemleriniYap.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnKontrolislemleriniYap.setBounds(10, 53, 145, 63);
+		btnKontrolislemleriniYap = new JButton("Kontrol İşlemlerini Yap");		
+		btnKontrolislemleriniYap.setBounds(10, 53, 160, 60);
+		btnKontrolislemleriniYap.addActionListener(this);
 		panel3.add(btnKontrolislemleriniYap);
 		
 		JLabel lblYaplanKontroller = new JLabel("Yapılan Kontroller : ");
-		lblYaplanKontroller.setBounds(179, 11, 109, 14);
+		lblYaplanKontroller.setBounds(180, 11, 109, 14);
 		panel3.add(lblYaplanKontroller);
 		
 		panel2 = new JPanel();
 		panel2.setLayout(null);
 		panel2.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Nihai Verilerin Olu\u015Fturulmas\u0131", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel2.setBounds(10, 317, 793, 145);
+		panel2.setBounds(10, 317, 652, 145);
 		contentPane.add(panel2);
 		
 		btnNihaiDosyaOlustur = new JButton("Nihai Dosyayı oluştur");
-		btnNihaiDosyaOlustur.setBounds(10, 40, 139, 67);
+		btnNihaiDosyaOlustur.setBounds(10, 42, 160, 60);
+		btnNihaiDosyaOlustur.addActionListener(this);
 		panel2.add(btnNihaiDosyaOlustur);
 		
-		JTextArea textArea_1 = new JTextArea();
-		textArea_1.setBounds(182, 26, 268, 105);
-		panel2.add(textArea_1);
+		textArea1 = new JTextArea();
+		textArea1.setBounds(180, 29, 340, 105);
+		panel2.add(textArea1);
 		
-		JLabel lblIlemSonucuhatalar = new JLabel("İşlem Sonucu(Hatalar) : ");
-		lblIlemSonucuhatalar.setBounds(182, 11, 150, 14);
+		lblIlemSonucuhatalar = new JLabel("İşlem Sonucu(Hatalar) : ");
+		lblIlemSonucuhatalar.setBounds(180, 11, 150, 14);
 		panel2.add(lblIlemSonucuhatalar);
-		btnNihaiDosyaOlustur.addActionListener(this);
+		
 		
 	}
 
@@ -151,42 +166,82 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		{
 			JFileChooser chooser= new JFileChooser();
 			chooser.setDialogTitle("Dosya1'yi seçiniz");
+			chooser.setCurrentDirectory(new File("."));            //jar dosyasının çalıştırıldığı dizini default olarak açar.
 
 			int choice = chooser.showOpenDialog(contentPane);
 
 			if (choice != JFileChooser.APPROVE_OPTION) return;
 
-			File chosenFile = chooser.getSelectedFile();
-			lblSecilenDosya1Path.setText(chosenFile.getAbsolutePath());					
+			chosenFile1 = chooser.getSelectedFile();
+			
+			doldurulacakDosyaPath = chosenFile1.getAbsolutePath();
+			lblSecilenDosya1Path.setText(chosenFile1.getAbsolutePath());					
 		}
+		
 		if(e.getSource()==btnDosyaSec2) 
 		{
 			JFileChooser chooser= new JFileChooser();
 			chooser.setDialogTitle("Dosya2'yi seçiniz");
+			chooser.setCurrentDirectory(new File("."));
 
 			int choice = chooser.showOpenDialog(contentPane);
 
 			if (choice != JFileChooser.APPROVE_OPTION) return;
 
-			File chosenFile = chooser.getSelectedFile();
-			lblSecilenDosya2Path.setText(chosenFile.getAbsolutePath());					
-		}
-		
+			chosenFile2 = chooser.getSelectedFile();
+			veriDosyasiPath = chosenFile2.getAbsolutePath();
+			lblSecilenDosya2Path.setText(chosenFile2.getAbsolutePath());					
+		}		
 		
 		if(e.getSource()==btnNihaiDosyaOlustur) 
 		{
-			//Bu kısımda ilgili dosya oluşturulacak.
-			JFileChooser chooser= new JFileChooser();
-			chooser.setDialogTitle("Dosya2'yi seçiniz");
-
-			int choice = chooser.showOpenDialog(contentPane);
-
-			if (choice != JFileChooser.APPROVE_OPTION) return;
-
-			//File chosenFile = chooser.getSelectedFile();
-			//lblSecilenDosya2Path.setText(chosenFile.getAbsolutePath());
+			Exception e2 = null;
+			
+			if(doldurulacakDosyaPath==null || doldurulacakDosyaPath.trim().isEmpty() || veriDosyasiPath==null || veriDosyasiPath.trim().isEmpty() ) 
+			{
+				JOptionPane.showMessageDialog
+				(
+				    null, 
+				    "Doldurulacak dosya ve veri dosyası mutlaka seçilmelidir..", // Message
+				    "Error",                                         			// Dialog Title
+				    JOptionPane.ERROR_MESSAGE                        			// Message Type (Icon)
+				);
+				return;
+			}
 			
 			
+			
+			doldurulacakDosyaKopyaPath = ExcelProcessor.copyAndGetNewFileName(doldurulacakDosyaPath);//, "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm");
+	    	System.out.println("Yeni Dosya adı : " + doldurulacakDosyaKopyaPath);
+	    	
+	    	textArea1.append("Nihai Dosya adı : " + doldurulacakDosyaKopyaPath + "\n");
+	    	
+	    	e2 = ExcelProcessor.dosyaDoldur(doldurulacakDosyaKopyaPath, veriDosyasiPath);	    	
+	    	
+	    	
+	    	if(Objects.isNull(e2))
+	    		textArea1.append("İşlem başarı ile tamamlandı.");
+	    	else	    						
+	    	{
+	    		textArea1.append("Hata oluştu:\n" + e2.getStackTrace());
+	    		textArea1.append("Hata oluştu:\n" + e2.getMessage()); 
+	    	}
+			
+	    	
 		}
+		
+		if(e.getSource()==btnKontrolislemleriniYap) 
+		{			
+			
+			JOptionPane.showMessageDialog(
+				    null, 
+				    "Bu işlem adımı henüz yapılmadı.",       // Message
+				    "Bilgi",                                 // Dialog Title
+				    JOptionPane.INFORMATION_MESSAGE          // Message Type (Icon)
+				);					
+						    		    					
+		}
+		
+		
 	}
 }

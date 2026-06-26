@@ -22,19 +22,34 @@ public class ExcelProcessor
 {
     public static void main(String[] args) 
     {        
+    	/*
+    		Dosya doldurulurken hata oluşması durumunda bu dosya bozulabiliyor.
+    		Asıl dosyanın bozulmaması için önce kopyası alınıyor.
+    		Doldurma işlemleri bu kopya üzerinde yapılıyor.
+    	*/
+    	
+    	String doldurulacakDosyaPathOrjinal = "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b - Orjinal.xlsm";
     	String doldurulacakDosyaPath = "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm";
     	String veriDosyasiPath  = "D:\\KorayBey\\YUSUF_SONUC.xlsx";
     	
-    	dosyaDoldur(doldurulacakDosyaPath, veriDosyasiPath);        
+    	String doldurulacakDosyaKopyaPath = copyAndGetNewFileName("D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b - Orjinal.xlsm");//, "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm");
+    	System.out.println("Yeni Dosya adı : " + doldurulacakDosyaKopyaPath);
+    	
+    	//dosyaDoldur(doldurulacakDosyaKopyaPath, veriDosyasiPath);
+    	
+     	//String []parts = "WStatR_TRT_XX_DC2026_v00.m02b.xlsm".split("\\.");
+     	//System.out.println(parts.length);
+     	
+     	
     }
     
-    public static void dosyaDoldur(String doldurulacakDosyaPath, String veriDosyasiPath) 
+    public static Exception dosyaDoldur(String doldurulacakDosyaPath, String veriDosyasiPath) 
     {
         //String filePath = "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm";
     	String filePath = doldurulacakDosyaPath;
     	//String veriDosyasiPath = "D:\\KorayBey\\YUSUF_SONUC.xlsx";
-        
-        copyFile("D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b - Orjinal.xlsm", "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm");
+    	
+    	Exception e1=null;
 
         try 
         { 
@@ -234,12 +249,14 @@ public class ExcelProcessor
             
         } 
         catch (Exception e) 
-        {
+        {        	
             e.printStackTrace();
+            e1 = e;
         }
+        
+        return e1;
     }
-    
-    
+        
     public static String lookupValue(String filePath, String searchKey, int keyColumn, int returnColumn) 
     {
         try 
@@ -450,21 +467,36 @@ public class ExcelProcessor
         }            	
     }
 
-    public static void copyFile(String sourceFilePath, String targetFilePath) 
+    public static String copyAndGetNewFileName(String sourceFilePath) //, String targetFilePath) 
     {
         //Path source = Paths.get("D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b - Orjinal.xlsm");
         //Path target = Paths.get("D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm");
     	
+    	String targetFilePath ="";
+    	String []parts = sourceFilePath.split("\\.");  
+    	
+    	int partsCount = parts.length;
+    	targetFilePath = parts[0];
+    	
+    	for(int i=1; i<partsCount-1; i++) 
+    	{
+    		targetFilePath = targetFilePath + "." + parts[i] ;
+    	}
+    	
+    	targetFilePath = targetFilePath + "-asdf" + "." + parts[partsCount-1];
+    	
         Path source = Paths.get(sourceFilePath);
         Path target = Paths.get(targetFilePath);
 
-        try {
+        try 
+        {
             // Overwrites the existing file if it is already present
             Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
             System.out.println("File copied successfully!");
         } catch (IOException e) {
             e.printStackTrace();
         }
+		return targetFilePath;
     }
 }
 
