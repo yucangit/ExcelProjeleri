@@ -12,6 +12,7 @@ import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,6 +49,10 @@ public class ExcelProcessor
         //String filePath = "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm";
     	String filePath = doldurulacakDosyaPath;
     	//String veriDosyasiPath = "D:\\KorayBey\\YUSUF_SONUC.xlsx";
+    
+    	// Apache POI 5.2.5 için xlsx servis sağlayıcılarını belleğe zorla yükler
+    	org.apache.poi.ss.usermodel.WorkbookFactory.addProvider(new org.apache.poi.hssf.usermodel.HSSFWorkbookFactory());
+    	org.apache.poi.ss.usermodel.WorkbookFactory.addProvider(new org.apache.poi.xssf.usermodel.XSSFWorkbookFactory());
     	
     	Exception e1=null;
 
@@ -127,7 +132,7 @@ public class ExcelProcessor
 	            	String []arr = value.split(" ");
 	            		            	
 	            	
-	            	int miktar = 0;
+	            	double miktar = 0;
 	            	String gizlilik="";	  
 	            	
 	            	if(rowIdx==9)
@@ -135,10 +140,10 @@ public class ExcelProcessor
 	            	
 	            	if(!arr[0].equals("Value_Not_Found")) 
 	            	{
-		            	miktar = Integer.parseInt(arr[0]);
+		            	miktar = Double.parseDouble(arr[0]);
 		            	gizlilik = arr[1];
 		            	
-		            	System.out.printf("%5d  %10s \n", miktar, gizlilik);
+		            	System.out.printf("%5f  %10s \n", miktar, gizlilik);
 		            	
 		            	if( colIdx == 6 ||  colIdx == 11 || colIdx == 31  )    
 		            	{
@@ -220,7 +225,7 @@ public class ExcelProcessor
 	            		//bu durumdaki hücrelerin gizlilik durumu boş kalıyor. Güncellemeye gerek yok.
 	            		miktar =0;
 	            		//gizlilik = "";                                           
-	            		System.out.printf("%5d  %10s \n", miktar, gizlilik);
+	            		System.out.printf("%5f  %10s \n", miktar, gizlilik);
 	            		cellMiktar.setCellValue(miktar);	            		
 	            		//System.out.print("\n");
 	            	}	    	            		            		            	
@@ -246,6 +251,9 @@ public class ExcelProcessor
                         
             workbook.write(fos);
             workbook.close();
+            
+            fis.close();
+            fos.close();
             
         } 
         catch (Exception e) 
