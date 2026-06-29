@@ -383,6 +383,7 @@ public class ExcelProcessor
     public static String getCellKeyValue(Sheet sheet, Row row, Cell cell) 
     {
     	//returns concatenated properties
+    	//Bu method artık kullanılmıyor.
     	
     	int rowIdx = cell.getRowIndex();            	
     	
