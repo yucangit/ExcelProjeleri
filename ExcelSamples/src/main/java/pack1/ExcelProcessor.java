@@ -30,13 +30,17 @@ public class ExcelProcessor
     	*/
     	
     	String doldurulacakDosyaPathOrjinal = "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b - Orjinal.xlsm";
-    	String doldurulacakDosyaPath = "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm";
-    	String veriDosyasiPath  = "D:\\KorayBey\\YUSUF_SONUC.xlsx";
+    	//String doldurulacakDosyaPath = "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm";
+    	String veriDosyasiPath  = "D:\\KorayBey\\YUSUF_SONUC2.xlsx";
     	
     	String doldurulacakDosyaKopyaPath = copyAndGetNewFileName("D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b - Orjinal.xlsm");//, "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm");
     	System.out.println("Yeni Dosya adı : " + doldurulacakDosyaKopyaPath);
     	
-    	//dosyaDoldur(doldurulacakDosyaKopyaPath, veriDosyasiPath);
+    	//String sonuc = lookupValue2(veriDosyasiPath, "W011", "EKYAKMA", "1" );
+    	
+    	//System.out.println(sonuc);
+    	
+    	dosyaDoldur(doldurulacakDosyaKopyaPath, veriDosyasiPath);
     	
      	//String []parts = "WStatR_TRT_XX_DC2026_v00.m02b.xlsm".split("\\.");
      	//System.out.println(parts.length);
@@ -108,6 +112,9 @@ public class ExcelProcessor
             	if(rowIdx>117)                  //Bu değer dosyada son veri satırlarını gösteriyor. Bu satırdan sonrasına bakılmasın. (Dış döngüden de çıkılır.)
             		break;
             	
+            	if(rowIdx==112)
+            		System.out.print("");
+            	
             	for(int colIdx : colIdxList )
             	{            		            			
             		cellMiktar   = row.getCell(colIdx);
@@ -116,7 +123,7 @@ public class ExcelProcessor
 	            	String color = getCellColor(cellMiktar);
 	            	CellType hucreTuru = cellMiktar.getCellType();            	            	            	            	
 	            	
-	            	String atikKodu = getCellValue2(sheet, rowIdx, 1);       //W011, ...            	
+	            	//String atikKodu = getCellValue2(sheet, rowIdx, 1);       //W011, W032, ...            	
 	            	            	
 	            	if( !color.equals("FFFFFFFF") && (hucreTuru!=CellType.FORMULA) )    //mevcut hücre beyaz değilse ve formül yoksa bir sonraki satira geçilir.
 	            		break;            	            	
@@ -124,26 +131,34 @@ public class ExcelProcessor
 	            	//if( hucreTuru == CellType.FORMULA )         //CellType possible values = {NUMERIC, STRING, FORMULA, BLANK, BOOLEAN, ERROR}
 	            	//	break;
 	            	
-	            	String birlesik_kod = getCellKeyValue(sheet, row, cellMiktar);
+	            	//String birlesik_kod = getCellKeyValue(sheet, row, cellMiktar);
+	            	String atikKoduYontemNitelik = getAtikKoduYontemNitelik(sheet, row, cellMiktar);
 	            	
 	            	//String value = lookupValue("D:\\KorayBey\\YUSUF_SONUC.xlsx", birlesik_kod, 0, 6 );   //Kolon0:"ATIK_KOD_NITELIK_YONTEM", Kolon6 : "MIKTAR_GIZLILIK");
-	            	String value = lookupValue(veriDosyasiPath, birlesik_kod, 0, 6 );   //Kolon0:"ATIK_KOD_NITELIK_YONTEM", Kolon6 : "MIKTAR_GIZLILIK");
+	            	//String value = lookupValue(veriDosyasiPath, birlesik_kod, 0, 6 );   //Kolon0:"ATIK_KOD_NITELIK_YONTEM", Kolon6 : "MIKTAR_GIZLILIK");
 	            	
-	            	String []arr = value.split(" ");
+	            	String []params = atikKoduYontemNitelik.split("@");
+	            		            	
+	            	
+	            	String miktarVeSonuc = lookupValue2(veriDosyasiPath, params[0], params[1], params[2] );   //Kolon0:"ATIK_KOD_NITELIK_YONTEM", Kolon6 : "MIKTAR_GIZLILIK");
+	            	//String sonuc = lookupValue2(veriDosyasiPath, "W011", "EKYAKMA", "1" );
+	            	
+	            	String []arr = miktarVeSonuc.split(" ");
 	            		            	
 	            	
 	            	double miktar = 0;
+	            	
 	            	String gizlilik="";	  
 	            	
-	            	if(rowIdx==9)
+	            	if(rowIdx==9)                             //debug için eklendi. Silinebilir. (29.06.2026)
 	            		System.out.print("");
 	            	
 	            	if(!arr[0].equals("Value_Not_Found")) 
 	            	{
-		            	miktar = Double.parseDouble(arr[0]);
+		            	miktar = Double.parseDouble(arr[0].replace(',', '.'));
 		            	gizlilik = arr[1];
 		            	
-		            	System.out.printf("%5f  %10s \n", miktar, gizlilik);
+		            	System.out.printf("%10.3f  %10s \n", miktar, gizlilik);
 		            	
 		            	if( colIdx == 6 ||  colIdx == 11 || colIdx == 31 || colIdx == 36  )    
 		            	{
@@ -225,7 +240,7 @@ public class ExcelProcessor
 	            		//bu durumdaki hücrelerin gizlilik durumu boş kalıyor. Güncellemeye gerek yok.
 	            		miktar =0;
 	            		//gizlilik = "";                                           
-	            		System.out.printf("%5f  %10s \n", miktar, gizlilik);
+	            		System.out.printf("%10.3f  %10s \n", miktar, gizlilik);
 	            		cellMiktar.setCellValue(miktar);	            		
 	            		//System.out.print("\n");
 	            	}	    	            		            		            	
@@ -303,6 +318,67 @@ public class ExcelProcessor
         }
         return "Value_Not_Found";
     }
+    
+    public static String lookupValue2(String lookupFilePath, String atikKodu, String yontem, String nitelik) 
+    {
+    	//Önceki fonksiyonun çalışması için öncelikle ilgili dosyaya iki tane ekstra kolon eklenmesi gerekiyor.
+    	//Bu durumu elimine etmek için bu fonksiyon oluşturuldu.
+    	//Durum : Yapim aşamasında.
+    	
+    	FileInputStream fis=null;
+    	Workbook workbook=null;
+    	
+        String currAtikKod;
+        String currNitelik;
+        String currYontem;
+        String currMiktar;
+        String currGizlilik;
+        String miktarVeGizlilik = "Value_Not_Found";
+    	
+        try 
+        {
+        	fis = new FileInputStream(new File(lookupFilePath));
+            workbook = new XSSFWorkbook(fis);
+            
+            Sheet sheet = workbook.getSheetAt(0);
+            DataFormatter formatter = new DataFormatter();            
+            
+            //DataFormatter cleanly stringifies numbers, dates, and text styles automatically
+            //DataFormatter formatter = new DataFormatter();
+            //String cellValue = formatter.formatCellValue(cell);
+            
+            
+                        
+            for (Row row : sheet) 
+            {            	            	
+            	
+                currAtikKod = formatter.formatCellValue(row.getCell(0)).trim().replace("TOTAL_X_MIN", "TOT_X_MIN");
+                currNitelik = formatter.formatCellValue(row.getCell(1)).trim();
+                currYontem  = formatter.formatCellValue(row.getCell(2)).trim();
+                
+                if(row.getRowNum()>=532)
+                	System.out.print("");
+                
+                if( atikKodu.equals(currAtikKod) && yontem.equals(currYontem) && nitelik.equals(currNitelik) )
+                {
+                	currMiktar   = formatter.formatCellValue(row.getCell(3));
+                    currGizlilik = formatter.formatCellValue(row.getCell(4));
+                    miktarVeGizlilik = currMiktar + " " + currGizlilik;
+                	break;                	
+                }
+                
+            }
+            workbook.close();
+            fis.close();
+            
+        } 
+        catch (Exception e) 
+        {
+            e.printStackTrace();
+        }
+      
+        return miktarVeGizlilik;
+    }
         
     public static String getCellKeyValue(Sheet sheet, Row row, Cell cell) 
     {
@@ -345,6 +421,49 @@ public class ExcelProcessor
     	System.out.printf("%-8s      %-10s   %-15s   %-15s   %-10s  %-10s  %5d       %-30s",  cell.getAddress() , atikKodu,   nitelik,   yontem,   color, hucreTuru.toString(), rowIdx, birlesik_kod );    	
     	
     	return birlesik_kod;
+    }
+    
+    public static String getAtikKoduYontemNitelik(Sheet sheet, Row row, Cell cell) 
+    {
+    	//returns concatenated properties
+    	
+    	int rowIdx = cell.getRowIndex();            	
+    	
+    	String color = getCellColor(cell);
+    	
+    	CellType hucreTuru = cell.getCellType();            	            	            	            	
+    	
+    	String atikKodu = getCellValue2(sheet, rowIdx, 1);       //W011, ...            	    	            	    	               	    	    	
+    	
+    	String nitelik  = getCellValue(row.getCell(5));          //Nitelik(Hazardous, Non-Hazardous, ...
+    	String nitelikKodu ="";
+    	
+    	if(nitelik.trim().equals("Hazardous"))           
+    		nitelikKodu = "1";
+    	else if(nitelik.trim().equals("Non-hazardous"))  
+    		nitelikKodu = "2";
+    	else if(nitelik.trim().equals("Total"))
+    		nitelikKodu="Total";    	
+    	//else if(cell.getColumnIndex()==46)
+    	//	nitelikKodu="Total";
+    
+    	//column Type
+    	String yontem = "";  
+    	if(cell.getColumnIndex()==6)         yontem = "EKYAKMA";         //"Recovery - energy recovery (R1)"
+    	else if(cell.getColumnIndex()==11)   yontem = "YAKMA";           //"Disposal - incineration   (D10)"
+    	else if(cell.getColumnIndex()==16)   yontem = "GERI KAZANIM";    //"Recovery - recycling"
+    	else if(cell.getColumnIndex()==31)   yontem = "DDEPOLAMA";       //"Disposal - landfill(D1, D5, D12)"
+    	else if(cell.getColumnIndex()==36)   yontem = "SULU_ORTAM";      //"Disposal - landfill(D1, D5, D12)"
+    	else if(cell.getColumnIndex()==41)   yontem = "TOTAL_DDSLO";     //"Disposal - landfill and other(D1-D7, D12)"
+    	else if(cell.getColumnIndex()==46)   yontem = "Total";           //"Waste treatment"
+    	    	      
+    	
+    	String atikKoduNitelikYontem = atikKodu + "@" + yontem +"@" + nitelikKodu ; 
+    	
+    	//System.out.printf("%-8s   %-10s   %-15s   %-15s   %-10s  %-10s  %10s   %-20s       %10s     %-10s \n", "HucreAdresi", "AtikKodu",  "Nitelik", "Yontem", "Renk", "HucreTuru", "RowIndex", "Birlesik", "Miktar", "Gizlilik");
+    	System.out.printf("%-8s      %-10s   %-15s   %-15s   %-10s  %-10s  %5d       %-30s",  cell.getAddress() , atikKodu,   nitelik,   yontem,   color, hucreTuru.toString(), rowIdx, atikKoduNitelikYontem );    	
+    	
+    	return atikKoduNitelikYontem;
     }
     
     private static String getCellValue(Cell cell) 
@@ -395,8 +514,8 @@ public class ExcelProcessor
         String colorStr="";
         String cellAdres = cell.getAddress()+"";
         
-        if(cellAdres.equals("G107"))
-        	System.out.print("");
+        //if(cellAdres.equals("G107"))
+        //	System.out.print("");
         
         // 1. Get the cell style
         CellStyle cellStyle = cell.getCellStyle();
@@ -491,7 +610,7 @@ public class ExcelProcessor
     		targetFilePath = targetFilePath + "." + parts[i] ;
     	}
     	
-    	targetFilePath = targetFilePath + "-asdf" + "." + parts[partsCount-1];
+    	targetFilePath = targetFilePath + "-uygulama" + "." + parts[partsCount-1];
     	
         Path source = Paths.get(sourceFilePath);
         Path target = Paths.get(targetFilePath);
@@ -501,7 +620,9 @@ public class ExcelProcessor
             // Overwrites the existing file if it is already present
             Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
             System.out.println("File copied successfully!");
-        } catch (IOException e) {
+        } 
+        catch (IOException e) 
+        {
             e.printStackTrace();
         }
 		return targetFilePath;

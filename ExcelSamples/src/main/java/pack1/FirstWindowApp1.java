@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.border.LineBorder;
 import java.awt.Color;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.EtchedBorder;
 import java.awt.Font;
 import javax.swing.JTextPane;
@@ -44,6 +45,8 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 	private JTextArea textArea1;
 		
 	File chosenFile1, chosenFile2;
+    // 2. Create a filter targeting Excel extensions (.xlsx and .xls)
+    FileNameExtensionFilter excelFilter;
 	
 	String doldurulacakDosyaPath;
 	String doldurulacakDosyaKopyaPath;
@@ -158,6 +161,11 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		panel2.add(lblIlemSonucuhatalar);
 		
 		
+        // 2. Create a filter targeting Excel extensions (.xlsx and .xls)
+        //excelFilter = new FileNameExtensionFilter("Excel Files (*.xlsx, *.xls)", "xlsx", "xls", "xlsm");
+		excelFilter = new FileNameExtensionFilter("Excel Files (*.xlsx, *.xlsm)", "xlsx", "xlsm");            //Mevcut durumda .xls uzantılı dosyalarda hata oluşuyor.(29.06.2026)  
+		
+		
 	}
 
 	@Override
@@ -167,6 +175,10 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		{
 			JFileChooser chooser= new JFileChooser();
 			chooser.setDialogTitle("Dosya1'yi seçiniz");
+	        
+			// 3. Apply the filter to the chooser
+	        chooser.setFileFilter(excelFilter);
+			
 			chooser.setCurrentDirectory(new File("."));            //jar dosyasının çalıştırıldığı dizini default olarak açar.
 
 			int choice = chooser.showOpenDialog(contentPane);
@@ -183,6 +195,10 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		{
 			JFileChooser chooser= new JFileChooser();
 			chooser.setDialogTitle("Dosya2'yi seçiniz");
+			
+			// 3. Apply the filter to the chooser
+	        chooser.setFileFilter(excelFilter);
+	        
 			chooser.setCurrentDirectory(new File("."));
 
 			int choice = chooser.showOpenDialog(contentPane);
