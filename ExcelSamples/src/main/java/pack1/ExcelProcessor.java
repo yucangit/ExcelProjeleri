@@ -83,7 +83,7 @@ public class ExcelProcessor
               21  V    "Recovery - backfilling"                      0                         -                                                          -                            miktar verisi hep 0 olacak
               26  AA   "Recovery - recycling and backfilling"        Formül var.	           "Recovery-Recycling" kısmındaki gizlilik ile aynı olacak.  -               -            Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak. Recovery-Recyling kısmındaki gizlilik ile aynı olacak.
               31  AF   "Disposal - landfill (D1, D5, D12)"           Diğer dosyadan alınacak   Diğer dosyadan alınacak                                    DDepolama       -            -
-              36  AK   "Disposal - other(D2-D4, D6-D7)"              Formül var.               Diğer dosyadan alınacak                                    SULU_ORTAM      -            -
+              36  AK   "Disposal - other(D2-D4, D6-D7)"              Formül var.(düzelt)       Diğer dosyadan alınacak                                    SULU_ORTAM      -            -
               41  AP   "Disposal - landfill and other(D1-D7, D12)"   Formül var.               Diğer dosyadan alınacak                                    TOTAL_DDSLO     -            Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak.
               46  AU   "Waste treatment"                             Formül var.               Diğer dosyadan alınacak                                    Total           Total        Bu kolon tamamen gri renkte. Sadece gizlilik kolonu doldurulacak. 
             */            
@@ -145,13 +145,14 @@ public class ExcelProcessor
 		            	
 		            	System.out.printf("%5f  %10s \n", miktar, gizlilik);
 		            	
-		            	if( colIdx == 6 ||  colIdx == 11 || colIdx == 31  )    
+		            	if( colIdx == 6 ||  colIdx == 11 || colIdx == 31 || colIdx == 36  )    
 		            	{
 		            		/*
 		            			Hem miktar hem de gizlilik verisi diğer dosyadan alınacak.
 		            			Kolon : 6  - "Recovery - energy recovery (R1)"           
 		            			Kolon :11  - "Disposal - incineration (D10)"             
-		            			Kolon :31  - "Disposal - landfill (D1, D5, D12)"                       
+		            			Kolon :31  - "Disposal - landfill (D1, D5, D12)"     
+		            			Kolon :36  - "Disposal - other(D2-D4, D6-D7)" 
 		            		*/
 		            		
 		            		cellMiktar.setCellValue(miktar);
@@ -201,13 +202,12 @@ public class ExcelProcessor
 			            	*/		
 		            		
 		            	}
-		            	else if ( colIdx == 36 || colIdx == 41 || colIdx == 46 )    //Bu kolonların miktar kısmında formül var. Dolayısıyla bu kısım ayrıca güncellenmeyecek. Gizlilik kısmı ise diğer dosyadan alınacak 
+		            	else if ( colIdx == 41 || colIdx == 46 )    //Bu kolonların miktar kısmında formül var. Dolayısıyla bu kısım ayrıca güncellenmeyecek. Gizlilik kısmı ise diğer dosyadan alınacak 
 		            	{
 		            		/*
 		            		 	Bu kısımların miktar kısmında formul bulunduğundan bu hücrelerde bir güncelleme yapılmamalı.
 		            		 	Gizlilik değeri ise diğer dosyadan alınmalıdır.
-		            		 	
-			            		Kolon: 36 - "Disposal - other(D2-D4, D6-D7)"           
+		            		 				            		          
 			            		Kolon: 41 - "Disposal - landfill and other(D1-D7, D12)"
 			            		Kolon: 46 - "Waste treatment"                          
 							*/

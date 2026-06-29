@@ -126,7 +126,7 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		txtrBuKsmHenz = new JTextArea();
 		txtrBuKsmHenz.setFont(new Font("Monospaced", Font.PLAIN, 11));
 		txtrBuKsmHenz.setEditable(false);
-		txtrBuKsmHenz.setBounds(180, 29, 340, 128);
+		txtrBuKsmHenz.setBounds(180, 29, 384, 128);
 		panel3.add(txtrBuKsmHenz);
 		
 		btnKontrolislemleriniYap = new JButton("Kontrol İşlemlerini Yap");		
@@ -150,7 +150,7 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		panel2.add(btnNihaiDosyaOlustur);
 		
 		textArea1 = new JTextArea();
-		textArea1.setBounds(180, 29, 340, 105);
+		textArea1.setBounds(180, 29, 381, 105);
 		panel2.add(textArea1);
 		
 		lblIlemSonucuhatalar = new JLabel("İşlem Sonucu(Hatalar) : ");
@@ -179,7 +179,7 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 			lblSecilenDosya1Path.setText(chosenFile1.getAbsolutePath());					
 		}
 		
-		if(e.getSource()==btnDosyaSec2) 
+		else if(e.getSource()==btnDosyaSec2) 
 		{
 			JFileChooser chooser= new JFileChooser();
 			chooser.setDialogTitle("Dosya2'yi seçiniz");
@@ -192,9 +192,21 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 			chosenFile2 = chooser.getSelectedFile();
 			veriDosyasiPath = chosenFile2.getAbsolutePath();
 			lblSecilenDosya2Path.setText(chosenFile2.getAbsolutePath());					
-		}		
+		}
 		
-		if(e.getSource()==btnNihaiDosyaOlustur) 
+		else if(e.getSource()==btnKontrolislemleriniYap) 
+		{			
+			
+			JOptionPane.showMessageDialog(
+				    null, 
+				    "Bu işlem adımı henüz yapılmadı.",       // Message
+				    "Bilgi",                                 // Dialog Title
+				    JOptionPane.INFORMATION_MESSAGE          // Message Type (Icon)
+				);					
+						    		    					
+		}
+		
+		else if(e.getSource()==btnNihaiDosyaOlustur) 
 		{
 			Exception e2 = null;
 			
@@ -221,27 +233,27 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 	    	
 	    	
 	    	if(Objects.isNull(e2))
-	    		textArea1.append("İşlem başarı ile tamamlandı.");
+	    		textArea1.append("İşlem başarı ile tamamlandı.\n");
 	    	else	    						
 	    	{
 	    		textArea1.append("Hata oluştu:\n" + e2.getStackTrace());
-	    		textArea1.append("Hata oluştu:\n" + e2.getMessage()); 
+	    		textArea1.append("Hata oluştu:\n" + e2.getMessage());
+	    		
+	    		JOptionPane.showMessageDialog
+				(
+				    null, 
+				    "İşlem Sırasında hata oluştu:\n" + e2.getStackTrace() + "\n" + e2.getMessage(), // Message
+				    "Error",                                         			// Dialog Title
+				    JOptionPane.ERROR_MESSAGE                        			// Message Type (Icon)
+				);
+				return;
+				
 	    	}
 			
 	    	
 		}
 		
-		if(e.getSource()==btnKontrolislemleriniYap) 
-		{			
-			
-			JOptionPane.showMessageDialog(
-				    null, 
-				    "Bu işlem adımı henüz yapılmadı.",       // Message
-				    "Bilgi",                                 // Dialog Title
-				    JOptionPane.INFORMATION_MESSAGE          // Message Type (Icon)
-				);					
-						    		    					
-		}
+		
 		
 		
 	}
