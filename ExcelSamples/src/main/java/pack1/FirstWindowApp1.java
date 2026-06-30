@@ -10,6 +10,10 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.awt.event.ActionEvent;
@@ -47,6 +51,7 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 	private JLabel lblSecilenDosya1Path;
 	private JLabel lblSecilenDosya2Path;
 	private JLabel lblIlemSonucuhatalar;
+	private JLabel lblDebug;                      //Debug işlemleri için konulmuştu, kaldırılabilir  
 	
 	private JPanel panel1;
 	private JPanel panel2;
@@ -97,8 +102,8 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 	{
 		this.setTitle("EuroStat Verilerinin Oluşturulması");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 690, 531);
-		
+		setBounds(100, 100, 943, 531);
+						
 		contentPane = new JPanel();		
 		contentPane.setBorder(new LineBorder(new Color(0, 0, 0)));		
 		setContentPane(contentPane);
@@ -184,10 +189,86 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		textArea1 = new JTextArea();
 		scrollPane.setViewportView(textArea1);
 		
+		lblDebug = new JLabel("Seçilen Dosya1 Path : ");
+		lblDebug.setBounds(10, 11, 842, 14);
+		contentPane.add(lblDebug);
+		
+		String protocol = getProtokol();
+		
+		try 
+		{
+			if( "jar".equals(protocol) || "rsrc".equals(protocol) ) 
+			{	
+				String sourceFilePath = "/resources/Dosyalar/Parametreler.xlsx";				
+				Path path = Paths.get(sourceFilePath);
+				
+				if (!Files.exists(path)) 
+				{ 				
+					Utils.copyFileFromJar(sourceFilePath, "D:\\Parametreler.xlsx");
+				}
+				
+				sourceFilePath = "/resources/Dosyalar/log.txt";				
+				path = Paths.get(sourceFilePath);
+				if (!Files.exists(path)) 
+				{ 				
+					Utils.copyFileFromJar(sourceFilePath, "D:\\log.txt");
+				}											
+			}
+		} 
+		catch (Exception e) 
+		{
+				e.printStackTrace();
+		}
+				
+		lblDebug.setText("Protokol(IDE-file or JAR) : "+ getProtokol() + ", Path : "+  new File(".").getAbsolutePath() );
+		
 		
         // 2. Create a filter targeting Excel extensions (.xlsx and .xls)
         //excelFilter = new FileNameExtensionFilter("Excel Files (*.xlsx, *.xls)", "xlsx", "xls", "xlsm");
 		excelFilter = new FileNameExtensionFilter("Excel Files (*.xlsx, *.xlsm)", "xlsx", "xlsm");            //Mevcut durumda .xls uzantılı dosyalarda hata oluşuyor.(29.06.2026)  				
+	}		
+	
+	public String getProtokol() 
+	{
+		//Uygulama jar içinden caçlıştırılıyorsa "jar"
+		//         IDE içinden çalıştırılıyorsa da "file" ciktisi oluşuyor.
+		
+        URL classUrl = FirstWindowApp1.class.getResource("FirstWindowApp1.class");
+        String protocol = classUrl.getProtocol();
+
+        if ("jar".equals(protocol) || "rsrc".equals(protocol)) 
+        {
+            System.out.println("JAR içinden çalıştırıldı.");
+        } 
+        else if ("file".equals(protocol)) 
+        {
+            System.out.println("Eclipse / Klasör yapısından çalıştırıldı.");
+        }
+        
+        return protocol;
+    }
+	
+	public String parametersFilePathGetir() 
+	{
+		//Uygulama jar içinden caçlıştırılıyorsa "jar"
+				//         IDE içinden çalıştırılıyorsa da "file" ciktisi oluşuyor. 
+		
+		String parametersFilePath = ".\\src\\main\\resources\\Dosyalar\\Parametreler.xlsx";
+		
+		String protocol = getProtokol();
+        
+        if ("jar".equals(protocol)) 
+        {
+            System.out.println("Uygulama bir JAR dosyası ile çalışıyor!");
+            parametersFilePath = "resources/Dosyalar/Parametreler.xlsx";
+        } 
+        else 
+        {
+            System.out.println("Uygulama Eclipse veya IDE üzerinden çalışıyor!");
+        }
+        
+       return parametersFilePath;
+        		
 	}
 
 	public String getFileDialogLastDirPath(int parameterId) 
@@ -197,7 +278,9 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
     	FileInputStream fis=null;
     	Workbook workbook=null;
     	        
-    	String parametersFilePath = ".\\Parametreler.xlsx";    	        
+    	//String parametersFilePath = ".\\src\\main\\resources\\Dosyalar\\Parametreler.xlsx";
+    	String parametersFilePath = parametersFilePathGetir();
+    	
         String path = "";         //defaultFileDialogDirectory       
     	
         try 
@@ -214,7 +297,11 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
             	
             	int id = Integer.parseInt( formatter.formatCellValue(row.getCell(0)).trim() );      //id kolonu
             	path = formatter.formatCellValue(row.getCell(2)).trim();
-            	if(id==parameterId ) break;            	            
+            	if(id==parameterId ) 
+            	{
+            		System.out.println("parameterId = " + parameterId + " olan dosya için deafult path : " + path );
+            		break;            	            
+            	}
             }
             workbook.close();
             fis.close();
@@ -223,12 +310,13 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
         {
         	JOptionPane.showMessageDialog(
 				    null, 
-				    "Default FileDialog path alınırken hata oluştu.",       // Message
+				    "Default FileDialog path alınırken hata oluştu.\n" + e.getMessage(),       // Message
 				    "Hata",                                 // Dialog Title
 				    JOptionPane.ERROR_MESSAGE          // Message Type (Icon)
 				);		
 			
 		}
+               
         
         return path;
 	}	
@@ -237,7 +325,9 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 	public void setFileDialogLastDirPath(int parameterId, String newDirPath) 
 	{		
 		
-		String parametersFilePath = ".\\Parametreler.xlsx";
+		//String parametersFilePath = ".\\src\\main\\resources\\Dosyalar\\Parametreler.xlsx";
+    	String parametersFilePath = parametersFilePathGetir();
+    	
 		try
 		{
 			FileInputStream fis = new FileInputStream(new File(parametersFilePath));
@@ -289,16 +379,19 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		
 		if(e.getSource()==btnDosyaSec1) 
 		{
+			System.out.println("Uygulama caliştirma ortamı : " +  getProtokol());
+			
+			lblDebug.setText("Protokol(IDE-file or JAR) : "+ getProtokol() + ", Path : "+  getFileDialogLastDirPath(1) );
+			
 			String file1LastPath = getFileDialogLastDirPath(1).replace("\\", "\\\\");
 			
 			//System.out.println(file1DefaultPath);
 			
 			JFileChooser chooser= new JFileChooser();
-			chooser.setDialogTitle("Dosya1'yi seçiniz");
-	        
-			// 3. Apply the filter to the chooser
-	        chooser.setFileFilter(excelFilter);
+			chooser.setDialogTitle("Doldurulacak dosyayı seçiniz");	        			
+	        chooser.setFileFilter(excelFilter);                              // 3. Apply the filter to the chooser
 			
+	        //lblDebug.setText( new File(".").getAbsolutePath() );
 			//chooser.setCurrentDirectory(new File("."));                       //jar dosyasının çalıştırıldığı dizini default olarak açar.
 	        chooser.setCurrentDirectory(new File(file1LastPath));               //jar dosyasının çalıştırıldığı dizini default olarak açar.
 
@@ -321,11 +414,15 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		
 		else if(e.getSource()==btnDosyaSec2) 
 		{
+			
+			String file2LastPath = getFileDialogLastDirPath(2).replace("\\", "\\\\");
+			
 			JFileChooser chooser= new JFileChooser();
-			chooser.setDialogTitle("Dosya2'yi seçiniz");
+			chooser.setDialogTitle("Miktar ve Gizlilik değerlerinin bulunduğu dosyayı seçiniz");
 			
 			// 3. Apply the filter to the chooser
 	        chooser.setFileFilter(excelFilter);
+	        chooser.setCurrentDirectory(new File(file2LastPath));               //jar dosyasının çalıştırıldığı dizini default olarak açar.
 	        
 			chooser.setCurrentDirectory(new File("."));
 
