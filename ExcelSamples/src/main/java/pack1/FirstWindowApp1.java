@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.awt.event.ActionEvent;
@@ -20,6 +21,7 @@ import java.awt.Color;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -185,37 +187,34 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		
         // 2. Create a filter targeting Excel extensions (.xlsx and .xls)
         //excelFilter = new FileNameExtensionFilter("Excel Files (*.xlsx, *.xls)", "xlsx", "xls", "xlsm");
-		excelFilter = new FileNameExtensionFilter("Excel Files (*.xlsx, *.xlsm)", "xlsx", "xlsm");            //Mevcut durumda .xls uzantılı dosyalarda hata oluşuyor.(29.06.2026)  
-		
-		
+		excelFilter = new FileNameExtensionFilter("Excel Files (*.xlsx, *.xlsm)", "xlsx", "xlsm");            //Mevcut durumda .xls uzantılı dosyalarda hata oluşuyor.(29.06.2026)  				
 	}
 
-	public String getFileDialogLastDirPath() 
+	public String getFileDialogLastDirPath(int parameterId) 
 	{		
     	//Durum : Yapim aşamasında.
     	
     	FileInputStream fis=null;
     	Workbook workbook=null;
     	        
-    	String lookupFilePath = ".\\Parametreler.xlsx";
-    	        
-        String path = "";         //defaultFileDialogDirectory
-       
+    	String parametersFilePath = ".\\Parametreler.xlsx";    	        
+        String path = "";         //defaultFileDialogDirectory       
     	
         try 
         {
-        	fis = new FileInputStream(new File(lookupFilePath));
+        	fis = new FileInputStream(new File(parametersFilePath));
             workbook = new XSSFWorkbook(fis);
             
             Sheet sheet = workbook.getSheetAt(0);
-            DataFormatter formatter = new DataFormatter();                                                            
-            String defaultPath = "";    
+            DataFormatter formatter = new DataFormatter();                                                                          
                         
             for (Row row : sheet) 
             {
-            	String id = formatter.formatCellValue(row.getCell(0)).trim();      //id kolonu
+            	if(row.getRowNum()==0) continue;
+            	
+            	int id = Integer.parseInt( formatter.formatCellValue(row.getCell(0)).trim() );      //id kolonu
             	path = formatter.formatCellValue(row.getCell(2)).trim();
-            	if(id=="1" ) break;            	            
+            	if(id==parameterId ) break;            	            
             }
             workbook.close();
             fis.close();
@@ -232,6 +231,57 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		}
         
         return path;
+	}	
+	
+	
+	public void setFileDialogLastDirPath(int parameterId, String newDirPath) 
+	{		
+		
+		String parametersFilePath = ".\\Parametreler.xlsx";
+		try
+		{
+			FileInputStream fis = new FileInputStream(new File(parametersFilePath));
+	    	Workbook workbook = new XSSFWorkbook(fis);
+	    	fis.close();
+	    	
+	    	DataFormatter formatter = new DataFormatter();	    	
+	    	FileOutputStream fos = new FileOutputStream(new File(parametersFilePath));        			            
+	
+	        // Get the 9th worksheet   --SheetName = "Table_1 (COPY-PASTING)"
+	        Sheet sheet = workbook.getSheetAt(0);   
+	        
+	        for(Row row : sheet) 
+	        {
+	        	if(row.getRowNum()==0) continue;
+	        	
+	        	int id = Integer.parseInt( formatter.formatCellValue(row.getCell(0)).trim() );      //id kolonu
+	        	
+	        	if(id==parameterId ) 
+	        	{
+	        		Cell cell = row.getCell(2);
+	                cell.setCellValue(newDirPath);        		
+	        		break;
+	        	}	        	
+	        }        	        
+	        
+	        workbook.write(fos);	        	        
+	        
+	        System.out.println("newDirPath : " + newDirPath);
+	        
+	        workbook.close();
+	        fos.close();
+		}
+        catch (Exception e) 
+        {
+        	JOptionPane.showMessageDialog(
+				    null, 
+				    "Parametre dosyasında Default FileDialog path güncellenirken hata oluştu.\n"+ e.getMessage(),       // Message
+				    "Hata",                                 // Dialog Title
+				    JOptionPane.ERROR_MESSAGE          // Message Type (Icon)
+				);		
+			
+		}
+                
 	}
 	
 	@Override
@@ -239,19 +289,28 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		
 		if(e.getSource()==btnDosyaSec1) 
 		{
+			String file1LastPath = getFileDialogLastDirPath(1).replace("\\", "\\\\");
+			
+			//System.out.println(file1DefaultPath);
+			
 			JFileChooser chooser= new JFileChooser();
 			chooser.setDialogTitle("Dosya1'yi seçiniz");
 	        
 			// 3. Apply the filter to the chooser
 	        chooser.setFileFilter(excelFilter);
 			
-			chooser.setCurrentDirectory(new File("."));            //jar dosyasının çalıştırıldığı dizini default olarak açar.
+			//chooser.setCurrentDirectory(new File("."));                       //jar dosyasının çalıştırıldığı dizini default olarak açar.
+	        chooser.setCurrentDirectory(new File(file1LastPath));               //jar dosyasının çalıştırıldığı dizini default olarak açar.
 
 			int choice = chooser.showOpenDialog(contentPane);
 
 			if (choice != JFileChooser.APPROVE_OPTION) return;
 
 			chosenFile1 = chooser.getSelectedFile();
+			String newFileDirectory = chosenFile1.getParentFile().getAbsolutePath();
+			setFileDialogLastDirPath(1,newFileDirectory);
+			
+			//chooser.getCurrentDirectory();
 			
 			doldurulacakDosyaPath = chosenFile1.getAbsolutePath();
 			lblSecilenDosya1Path.setText(chosenFile1.getAbsolutePath());		

@@ -331,8 +331,8 @@ public class ExcelProcessor
         String currAtikKod;
         String currNitelik;
         String currYontem;
-        String currMiktar;
-        String currGizlilik;
+        String miktar;
+        String gizlilik;
         String miktarVeGizlilik = "Value_Not_Found";
     	
         try 
@@ -345,13 +345,12 @@ public class ExcelProcessor
             
             //DataFormatter cleanly stringifies numbers, dates, and text styles automatically
             //DataFormatter formatter = new DataFormatter();
-            //String cellValue = formatter.formatCellValue(cell);
-            
-            
+            //String cellValue = formatter.formatCellValue(cell);                        
                         
             for (Row row : sheet) 
             {            	            	
-            	
+            	//Veri dosyasında "TOT_X_MIN", doldurulacak dosyada ise "TOTAL_X_MIN" şeklinde bulunuyor.
+            	//Bu iki verinin eşleşebilmesi için aşağıdaki şekilde yapıldı.
                 currAtikKod = formatter.formatCellValue(row.getCell(0)).trim().replace("TOTAL_X_MIN", "TOT_X_MIN");
                 currNitelik = formatter.formatCellValue(row.getCell(1)).trim();
                 currYontem  = formatter.formatCellValue(row.getCell(2)).trim();
@@ -361,9 +360,14 @@ public class ExcelProcessor
                 
                 if( atikKodu.equals(currAtikKod) && yontem.equals(currYontem) && nitelik.equals(currNitelik) )
                 {
-                	currMiktar   = formatter.formatCellValue(row.getCell(3));
-                    currGizlilik = formatter.formatCellValue(row.getCell(4));
-                    miktarVeGizlilik = currMiktar + " " + currGizlilik;
+                	miktar   = formatter.formatCellValue(row.getCell(3)).trim();
+                    gizlilik = formatter.formatCellValue(row.getCell(4)).trim();
+                    
+                    if(gizlilik.equals("3"))       gizlilik = "C";
+                    else if(gizlilik.equals("11")) gizlilik = "D";
+                    
+                    miktarVeGizlilik = miktar + " " + gizlilik;
+                    
                 	break;                	
                 }
                 
@@ -574,7 +578,7 @@ public class ExcelProcessor
         	
         	FileOutputStream fos = new FileOutputStream(new File(filePath));        			            
 
-            // Get the 9th worksheet   --ShettName = "Table_1 (COPY-PASTING)"
+            // Get the 9th worksheet   --SheetName = "Table_1 (COPY-PASTING)"
             Sheet sheet = workbook.getSheetAt(9);   
             
             Cell cell = sheet.getRow(7).getCell(6);
