@@ -105,16 +105,15 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		setBounds(100, 100, 691, 531);
 						
 		contentPane = new JPanel();		
-		contentPane.setBorder(new LineBorder(new Color(0, 0, 0)));		
+		contentPane.setBorder(new LineBorder(new Color(0, 0, 0)));				
+		contentPane.setLayout(null);		
 		setContentPane(contentPane);
-		contentPane.setLayout(null);
-		
 		
 		panel1 = new JPanel();
 		panel1.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Girdi Dosyalar\u0131n\u0131n Se\u00E7ilmesi", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel1.setBounds(10, 28, 652, 99);
-		contentPane.add(panel1);
+		panel1.setBounds(10, 28, 652, 99);		
 		panel1.setLayout(null);
+		contentPane.add(panel1);
 		
 		lblDoldurulacakDosya1 = new JLabel("Doldurulacak Dosya :");
 		lblDoldurulacakDosya1.setBounds(10, 27, 160, 19);
@@ -164,10 +163,10 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		scrollPane_1.setBounds(180, 30, 440, 100);
 		panel3.add(scrollPane_1);
 		
-		JTextArea txtrBuKsmHenz = new JTextArea();
-		scrollPane_1.setViewportView(txtrBuKsmHenz);
+		JTextArea txtrBuKsmHenz = new JTextArea();		
 		txtrBuKsmHenz.setFont(new Font("Monospaced", Font.PLAIN, 11));
 		txtrBuKsmHenz.setEditable(false);
+		scrollPane_1.setViewportView(txtrBuKsmHenz);
 		
 		panel2 = new JPanel();
 		panel2.setLayout(null);

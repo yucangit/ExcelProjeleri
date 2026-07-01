@@ -65,7 +65,7 @@ public class ExcelProcessor
         	// Dynamic creation works for both xlsx and xlsm
         	
         	FileInputStream fis = new FileInputStream(new File(filePath));        		
-            Workbook workbook = WorkbookFactory.create(fis);
+            XSSFWorkbook workbook = new XSSFWorkbook(fis);
             fis.close();                                           
             
             FileOutputStream fos = new FileOutputStream(new File(filePath));    //dosyaya veri yazmak için kullanılır.
