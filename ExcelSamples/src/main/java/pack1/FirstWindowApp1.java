@@ -34,9 +34,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.border.EtchedBorder;
 import java.awt.Font;
+import java.awt.Insets;
+
 import javax.swing.JTextPane;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 
 public class FirstWindowApp1 extends JFrame implements ActionListener 
 {
@@ -51,14 +54,10 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 	private JLabel lblSecilenDosya1Path;
 	private JLabel lblSecilenDosya2Path;
 	private JLabel lblIlemSonucuhatalar;
-	private JLabel lblDebug;                      //Debug işlemleri için konulmuştu, kaldırılabilir  
 	
 	private JPanel panel1;
 	private JPanel panel2;
 	private JPanel panel3;
-	
-	private JTextArea txtrBuKsmHenz;
-	private JTextArea textArea1;
 		
 	File chosenFile1, chosenFile2;
     // 2. Create a filter targeting Excel extensions (.xlsx and .xls)
@@ -71,6 +70,7 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 	String doldurulacakDosyaKopyaPath;
 	String veriDosyasiPath;
 	String defaultFileDialogDirectory;
+	private JTextArea textArea1;
 	
 
 	/**
@@ -100,9 +100,9 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 	 */
 	public FirstWindowApp1() 
 	{
-		this.setTitle("EuroStat Verilerinin Oluşturulması");
+		this.setTitle("WSTAT_R Excel Dosyasının Doldurulması");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 943, 531);
+		setBounds(100, 100, 691, 531);
 						
 		contentPane = new JPanel();		
 		contentPane.setBorder(new LineBorder(new Color(0, 0, 0)));		
@@ -135,6 +135,7 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		panel1.add(btnDosyaSec2);
 		
 		lblSecilenDosya1Path = new JLabel("Seçilen Dosya1 Path : ");
+		lblSecilenDosya1Path.setFont(new Font("Dialog", Font.PLAIN, 10));
 		lblSecilenDosya1Path.setBounds(306, 29, 411, 14);
 		panel1.add(lblSecilenDosya1Path);
 		
@@ -146,23 +147,24 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		panel3 = new JPanel();
 		panel3.setLayout(null);
 		panel3.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Kontrol \u0130\u015Flemleri", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel3.setBounds(10, 138, 652, 168);
+		panel3.setBounds(10, 138, 652, 140);
 		contentPane.add(panel3);
 		
-		btnKontrolislemleriniYap = new JButton("Kontrol İşlemlerini Yap");		
-		btnKontrolislemleriniYap.setBounds(10, 53, 160, 60);
+		btnKontrolislemleriniYap = new JButton("Kontrol İşlemlerini Yap");
+		btnKontrolislemleriniYap.setBounds(10, 45, 150, 60);
+		btnKontrolislemleriniYap.setMargin(new Insets(5, 5, 5, 5)); 
 		btnKontrolislemleriniYap.addActionListener(this);
 		panel3.add(btnKontrolislemleriniYap);
 		
 		JLabel lblYaplanKontroller = new JLabel("Yapılan Kontroller : ");
-		lblYaplanKontroller.setBounds(180, 11, 109, 14);
+		lblYaplanKontroller.setBounds(180, 11, 109, 16);
 		panel3.add(lblYaplanKontroller);
 		
 		scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(180, 27, 385, 130);
+		scrollPane_1.setBounds(180, 30, 440, 100);
 		panel3.add(scrollPane_1);
 		
-		txtrBuKsmHenz = new JTextArea();
+		JTextArea txtrBuKsmHenz = new JTextArea();
 		scrollPane_1.setViewportView(txtrBuKsmHenz);
 		txtrBuKsmHenz.setFont(new Font("Monospaced", Font.PLAIN, 11));
 		txtrBuKsmHenz.setEditable(false);
@@ -170,221 +172,38 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		panel2 = new JPanel();
 		panel2.setLayout(null);
 		panel2.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)), "Nihai Verilerin Olu\u015Fturulmas\u0131", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel2.setBounds(10, 317, 652, 164);
+		panel2.setBounds(10, 290, 652, 190);
 		contentPane.add(panel2);
 		
 		btnNihaiDosyaOlustur = new JButton("Nihai Dosyayı oluştur");
-		btnNihaiDosyaOlustur.setBounds(10, 53, 160, 60);
+		btnNihaiDosyaOlustur.setBounds(10, 65, 150, 60);
+		btnNihaiDosyaOlustur.setMargin(new Insets(5, 5, 5, 5)); 
 		btnNihaiDosyaOlustur.addActionListener(this);
 		panel2.add(btnNihaiDosyaOlustur);
 		
-		lblIlemSonucuhatalar = new JLabel("İşlem Sonucu(Hatalar) : ");
-		lblIlemSonucuhatalar.setBounds(180, 11, 150, 14);
+		lblIlemSonucuhatalar = new JLabel("İşlem Sonucu-Hatalar : ");
+		lblIlemSonucuhatalar.setBounds(180, 11, 150, 16);
 		panel2.add(lblIlemSonucuhatalar);
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(180, 29, 388, 124);
+		scrollPane.setBounds(180, 30, 440, 150);
 		panel2.add(scrollPane);
 		
 		textArea1 = new JTextArea();
 		scrollPane.setViewportView(textArea1);
 		
-		lblDebug = new JLabel("Seçilen Dosya1 Path : ");
-		lblDebug.setBounds(10, 11, 842, 14);
-		contentPane.add(lblDebug);
-		
-		String protocol = getProtokol();
-		
-		try 
-		{
-			if( "jar".equals(protocol) || "rsrc".equals(protocol) ) 
-			{	
-				String sourceFilePath = "/resources/Dosyalar/Parametreler.xlsx";				
-				Path path = Paths.get(sourceFilePath);
-				
-				if (!Files.exists(path)) 
-				{ 				
-					Utils.copyFileFromJar(sourceFilePath, "D:\\Parametreler.xlsx");
-				}
-				
-				sourceFilePath = "/resources/Dosyalar/log.txt";				
-				path = Paths.get(sourceFilePath);
-				if (!Files.exists(path)) 
-				{ 				
-					Utils.copyFileFromJar(sourceFilePath, "D:\\log.txt");
-				}											
-			}
-		} 
-		catch (Exception e) 
-		{
-				e.printStackTrace();
-		}
-				
-		lblDebug.setText("Protokol(IDE-file or JAR) : "+ getProtokol() + ", Path : "+  new File(".").getAbsolutePath() );
-		
 		
         // 2. Create a filter targeting Excel extensions (.xlsx and .xls)
         //excelFilter = new FileNameExtensionFilter("Excel Files (*.xlsx, *.xls)", "xlsx", "xls", "xlsm");
 		excelFilter = new FileNameExtensionFilter("Excel Files (*.xlsx, *.xlsm)", "xlsx", "xlsm");            //Mevcut durumda .xls uzantılı dosyalarda hata oluşuyor.(29.06.2026)  				
-	}		
-	
-	public String getProtokol() 
-	{
-		//Uygulama jar içinden caçlıştırılıyorsa "jar"
-		//         IDE içinden çalıştırılıyorsa da "file" ciktisi oluşuyor.
-		
-        URL classUrl = FirstWindowApp1.class.getResource("FirstWindowApp1.class");
-        String protocol = classUrl.getProtocol();
-
-        if ("jar".equals(protocol) || "rsrc".equals(protocol)) 
-        {
-            System.out.println("JAR içinden çalıştırıldı.");
-        } 
-        else if ("file".equals(protocol)) 
-        {
-            System.out.println("Eclipse / Klasör yapısından çalıştırıldı.");
-        }
-        
-        return protocol;
-    }
-	
-	public String parametersFilePathGetir() 
-	{
-		//Uygulama jar içinden caçlıştırılıyorsa "jar"
-				//         IDE içinden çalıştırılıyorsa da "file" ciktisi oluşuyor. 
-		
-		String parametersFilePath = ".\\src\\main\\resources\\Dosyalar\\Parametreler.xlsx";
-		
-		String protocol = getProtokol();
-        
-        if ("jar".equals(protocol)) 
-        {
-            System.out.println("Uygulama bir JAR dosyası ile çalışıyor!");
-            parametersFilePath = "resources/Dosyalar/Parametreler.xlsx";
-        } 
-        else 
-        {
-            System.out.println("Uygulama Eclipse veya IDE üzerinden çalışıyor!");
-        }
-        
-       return parametersFilePath;
-        		
-	}
-
-	public String getFileDialogLastDirPath(int parameterId) 
-	{		
-    	//Durum : Yapim aşamasında.
-    	
-    	FileInputStream fis=null;
-    	Workbook workbook=null;
-    	        
-    	//String parametersFilePath = ".\\src\\main\\resources\\Dosyalar\\Parametreler.xlsx";
-    	String parametersFilePath = parametersFilePathGetir();
-    	
-        String path = "";         //defaultFileDialogDirectory       
-    	
-        try 
-        {
-        	fis = new FileInputStream(new File(parametersFilePath));
-            workbook = new XSSFWorkbook(fis);
-            
-            Sheet sheet = workbook.getSheetAt(0);
-            DataFormatter formatter = new DataFormatter();                                                                          
-                        
-            for (Row row : sheet) 
-            {
-            	if(row.getRowNum()==0) continue;
-            	
-            	int id = Integer.parseInt( formatter.formatCellValue(row.getCell(0)).trim() );      //id kolonu
-            	path = formatter.formatCellValue(row.getCell(2)).trim();
-            	if(id==parameterId ) 
-            	{
-            		System.out.println("parameterId = " + parameterId + " olan dosya için deafult path : " + path );
-            		break;            	            
-            	}
-            }
-            workbook.close();
-            fis.close();
-        }
-        catch (Exception e) 
-        {
-        	JOptionPane.showMessageDialog(
-				    null, 
-				    "Default FileDialog path alınırken hata oluştu.\n" + e.getMessage(),       // Message
-				    "Hata",                                 // Dialog Title
-				    JOptionPane.ERROR_MESSAGE          // Message Type (Icon)
-				);		
+	}							
 			
-		}
-               
-        
-        return path;
-	}	
-	
-	
-	public void setFileDialogLastDirPath(int parameterId, String newDirPath) 
-	{		
-		
-		//String parametersFilePath = ".\\src\\main\\resources\\Dosyalar\\Parametreler.xlsx";
-    	String parametersFilePath = parametersFilePathGetir();
-    	
-		try
-		{
-			FileInputStream fis = new FileInputStream(new File(parametersFilePath));
-	    	Workbook workbook = new XSSFWorkbook(fis);
-	    	fis.close();
-	    	
-	    	DataFormatter formatter = new DataFormatter();	    	
-	    	FileOutputStream fos = new FileOutputStream(new File(parametersFilePath));        			            
-	
-	        // Get the 9th worksheet   --SheetName = "Table_1 (COPY-PASTING)"
-	        Sheet sheet = workbook.getSheetAt(0);   
-	        
-	        for(Row row : sheet) 
-	        {
-	        	if(row.getRowNum()==0) continue;
-	        	
-	        	int id = Integer.parseInt( formatter.formatCellValue(row.getCell(0)).trim() );      //id kolonu
-	        	
-	        	if(id==parameterId ) 
-	        	{
-	        		Cell cell = row.getCell(2);
-	                cell.setCellValue(newDirPath);        		
-	        		break;
-	        	}	        	
-	        }        	        
-	        
-	        workbook.write(fos);	        	        
-	        
-	        System.out.println("newDirPath : " + newDirPath);
-	        
-	        workbook.close();
-	        fos.close();
-		}
-        catch (Exception e) 
-        {
-        	JOptionPane.showMessageDialog(
-				    null, 
-				    "Parametre dosyasında Default FileDialog path güncellenirken hata oluştu.\n"+ e.getMessage(),       // Message
-				    "Hata",                                 // Dialog Title
-				    JOptionPane.ERROR_MESSAGE          // Message Type (Icon)
-				);		
-			
-		}
-                
-	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
 		if(e.getSource()==btnDosyaSec1) 
-		{
-			System.out.println("Uygulama caliştirma ortamı : " +  getProtokol());
-			
-			lblDebug.setText("Protokol(IDE-file or JAR) : "+ getProtokol() + ", Path : "+  getFileDialogLastDirPath(1) );
-			
-			String file1LastPath = getFileDialogLastDirPath(1).replace("\\", "\\\\");
-			
+		{					
 			//System.out.println(file1DefaultPath);
 			
 			JFileChooser chooser= new JFileChooser();
@@ -392,37 +211,28 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 	        chooser.setFileFilter(excelFilter);                              // 3. Apply the filter to the chooser
 			
 	        //lblDebug.setText( new File(".").getAbsolutePath() );
-			//chooser.setCurrentDirectory(new File("."));                       //jar dosyasının çalıştırıldığı dizini default olarak açar.
-	        chooser.setCurrentDirectory(new File(file1LastPath));               //jar dosyasının çalıştırıldığı dizini default olarak açar.
+			chooser.setCurrentDirectory(new File("."));                       //jar dosyasının çalıştırıldığı dizini default olarak açar.
 
 			int choice = chooser.showOpenDialog(contentPane);
 
 			if (choice != JFileChooser.APPROVE_OPTION) return;
 
-			chosenFile1 = chooser.getSelectedFile();
-			String newFileDirectory = chosenFile1.getParentFile().getAbsolutePath();
-			setFileDialogLastDirPath(1,newFileDirectory);
+			chosenFile1 = chooser.getSelectedFile();		
 			
 			//chooser.getCurrentDirectory();
 			
 			doldurulacakDosyaPath = chosenFile1.getAbsolutePath();
-			lblSecilenDosya1Path.setText(chosenFile1.getAbsolutePath());		
-			
-			
-			//getFileDialogLastDirPath();
+			lblSecilenDosya1Path.setText(chosenFile1.getAbsolutePath());								
 		}
 		
 		else if(e.getSource()==btnDosyaSec2) 
-		{
-			
-			String file2LastPath = getFileDialogLastDirPath(2).replace("\\", "\\\\");
+		{						
 			
 			JFileChooser chooser= new JFileChooser();
 			chooser.setDialogTitle("Miktar ve Gizlilik değerlerinin bulunduğu dosyayı seçiniz");
 			
 			// 3. Apply the filter to the chooser
-	        chooser.setFileFilter(excelFilter);
-	        chooser.setCurrentDirectory(new File(file2LastPath));               //jar dosyasının çalıştırıldığı dizini default olarak açar.
+	        chooser.setFileFilter(excelFilter);	       
 	        
 			chooser.setCurrentDirectory(new File("."));
 
@@ -464,21 +274,37 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 			}
 			
 			
+			textArea1.append("İşlemler başlatılıyor...\n\n");
 			
-			doldurulacakDosyaKopyaPath = ExcelProcessor.copyAndGetNewFileName(doldurulacakDosyaPath);//, "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm");
-	    	System.out.println("Yeni Dosya adı : " + doldurulacakDosyaKopyaPath);
+			textArea1.append("Doldurulacak dosyanın kopyası alınıyor");
+			
+			textArea1.update(textArea1.getGraphics());
+			
+			doldurulacakDosyaKopyaPath = ExcelProcessor.copyAndGetNewFileName(doldurulacakDosyaPath);//, "D:\\KorayBey\\WStatR_TRT_XX_DC2026_v00.m02b.xlsm");	    				
+			
+			textArea1.append(" - İşlem Başarılı.\n");
+			
+			System.out.println("Yeni Dosya adı : " + doldurulacakDosyaKopyaPath);
+	    		    		    		    		    	
+	    	//-----------------Doldurma işlemi---------------------
 	    	
-	    	textArea1.append("Nihai Dosya adı : " + doldurulacakDosyaKopyaPath + "\n");
+	    	textArea1.append("Excel doldurma işlemi başlatılıyor");
 	    	
-	    	e2 = ExcelProcessor.dosyaDoldur(doldurulacakDosyaKopyaPath, veriDosyasiPath);	    	
+	    	textArea1.update(textArea1.getGraphics());
+	    	
+	    	e2 = ExcelProcessor.dosyaDoldur(doldurulacakDosyaKopyaPath, veriDosyasiPath);
+
+	    	textArea1.append(" - İşlem Başarılı.\n");
+	    	
+	    	textArea1.append("\nNihai Dosya adı : \n    " + doldurulacakDosyaKopyaPath + "\n");
 	    	
 	    	
 	    	if(Objects.isNull(e2))
-	    		textArea1.append("İşlem başarı ile tamamlandı.\n");
+	    		textArea1.append("\n");
 	    	else	    						
 	    	{
 	    		textArea1.append("Hata oluştu:\n" + e2.getStackTrace());
-	    		textArea1.append("Hata oluştu:\n" + e2.getMessage());
+	    		textArea1.append("\n" + e2.getMessage());
 	    		
 	    		JOptionPane.showMessageDialog
 				(

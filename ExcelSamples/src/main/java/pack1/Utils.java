@@ -2,6 +2,7 @@ package pack1;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,6 +37,26 @@ public class Utils
             // 3. Stream the file directly to the external directory
             Files.copy(in, targetPath2, StandardCopyOption.REPLACE_EXISTING);
         }        
+    }
+	
+	public static String getProtokol() 
+	{
+		//Uygulama jar içinden caçlıştırılıyorsa "jar"
+		//         IDE içinden çalıştırılıyorsa da "file" ciktisi oluşuyor.
+		
+        URL classUrl = FirstWindowApp1.class.getResource("FirstWindowApp1.class");
+        String protocol = classUrl.getProtocol();
+
+        if ("jar".equals(protocol) || "rsrc".equals(protocol)) 
+        {
+            System.out.println("JAR içinden çalıştırıldı.");
+        } 
+        else if ("file".equals(protocol)) 
+        {
+            System.out.println("Eclipse / Klasör yapısından çalıştırıldı.");
+        }
+        
+        return protocol;
     }
 	
 	public static void isFileExists(String filePath) 
