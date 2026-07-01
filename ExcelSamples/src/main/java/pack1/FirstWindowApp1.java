@@ -63,14 +63,16 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
     // 2. Create a filter targeting Excel extensions (.xlsx and .xls)
     FileNameExtensionFilter excelFilter;
 	
-    private JScrollPane scrollPane;
-	private JScrollPane scrollPane_1;
+    private JTextArea textArea1;
+	private JTextArea txtrBuKsmHenz;
+	
+    private JScrollPane scrollPaneNihaiDosya;
+	private JScrollPane scrollPaneKontroller;
     
     String doldurulacakDosyaPath;
 	String doldurulacakDosyaKopyaPath;
 	String veriDosyasiPath;
-	String defaultFileDialogDirectory;
-	private JTextArea textArea1;
+	String defaultFileDialogDirectory;	
 	
 
 	/**
@@ -159,14 +161,14 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		lblYaplanKontroller.setBounds(180, 11, 109, 16);
 		panel3.add(lblYaplanKontroller);
 		
-		scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(180, 30, 440, 100);
-		panel3.add(scrollPane_1);
+		scrollPaneKontroller = new JScrollPane();
+		scrollPaneKontroller.setBounds(180, 30, 440, 100);
+		panel3.add(scrollPaneKontroller);
 		
-		JTextArea txtrBuKsmHenz = new JTextArea();		
+		txtrBuKsmHenz = new JTextArea();
+		scrollPaneKontroller.setViewportView(txtrBuKsmHenz);
 		txtrBuKsmHenz.setFont(new Font("Monospaced", Font.PLAIN, 11));
 		txtrBuKsmHenz.setEditable(false);
-		scrollPane_1.setViewportView(txtrBuKsmHenz);
 		
 		panel2 = new JPanel();
 		panel2.setLayout(null);
@@ -184,12 +186,12 @@ public class FirstWindowApp1 extends JFrame implements ActionListener
 		lblIlemSonucuhatalar.setBounds(180, 11, 150, 16);
 		panel2.add(lblIlemSonucuhatalar);
 		
-		scrollPane = new JScrollPane();
-		scrollPane.setBounds(180, 30, 440, 150);
-		panel2.add(scrollPane);
+		scrollPaneNihaiDosya = new JScrollPane();
+		scrollPaneNihaiDosya.setBounds(180, 30, 440, 150);
+		panel2.add(scrollPaneNihaiDosya);
 		
 		textArea1 = new JTextArea();
-		scrollPane.setViewportView(textArea1);
+		scrollPaneNihaiDosya.setViewportView(textArea1);
 		
 		
         // 2. Create a filter targeting Excel extensions (.xlsx and .xls)
